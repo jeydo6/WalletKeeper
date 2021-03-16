@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using WalletKeeper.Barcodes.Decoders;
@@ -20,6 +19,8 @@ namespace WalletKeeper.ConsoleApp
 			var result = decoder.Decode(image);
 
 			var receiptHeader = ReceiptHeader.Parse(result);
+
+
 		}
 	}
 }

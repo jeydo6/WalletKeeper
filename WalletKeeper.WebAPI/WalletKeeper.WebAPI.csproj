@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<UserSecretsId>b8b6957e-8af5-4081-8ebe-a4b24d81ead4</UserSecretsId>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Version>0.1.0</Version>
+		<Authors>Vladimir Deryagin</Authors>
+		<Title>Wallet Keeper</Title>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\WalletKeeper.Domain\WalletKeeper.Domain.csproj" />
+	  <ProjectReference Include="..\WalletKeeper.Persistence\WalletKeeper.Persistence.csproj" />
+	</ItemGroup>
+
+</Project>
