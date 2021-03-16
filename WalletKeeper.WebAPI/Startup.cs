@@ -29,23 +29,17 @@ namespace WalletKeeper.WebAPI
 				.ReadFrom.Configuration(Configuration)
 				.CreateLogger();
 
-			AuthOptions = Configuration
+			EndpointConfig = Configuration
 				.GetSection("EndpointConfig")
 				.Get<EndpointConfig>();
 		}
 
 		public IConfiguration Configuration { get; }
 
-		private EndpointConfig AuthOptions { get; }
+		private EndpointConfig EndpointConfig { get; }
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddDbContext<IdentityDbContext>(options =>
-				options.UseSqlServer(
-					Configuration.GetConnectionString("IdentityConnection")
-				)
-			);
-
 			services
 				.AddControllers()
 				.AddNewtonsoftJson();
@@ -58,6 +52,92 @@ namespace WalletKeeper.WebAPI
 					Configuration.GetSection("EndpointConfig")
 				);
 
+			services
+				.AddDbContext<IdentityDbContext>(options =>
+					options.UseSqlServer(
+						Configuration.GetConnectionString("IdentityConnection")
+					)
+				);
+
+			services
+				.AddSwaggerGen(options =>
+				{
+					options.SwaggerDoc("main", new OpenApiInfo
+					{
+						Version = System.Reflection.Assembly
+							.GetEntryAssembly()
+							.GetName()
+							.Version
+							.ToString(),
+						Title = "WalletKeeperAPI",
+						Description = "Wallet Keeper WebAPI"
+					});
+
+					options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+					{
+						In = ParameterLocation.Header,
+						Description = "Please enter into field the word 'Bearer' following by space and JWT",
+						Name = "Authorization",
+						Type = SecuritySchemeType.ApiKey
+					});
+
+					options.AddSecurityRequirement(new OpenApiSecurityRequirement
+					{
+						{
+							new OpenApiSecurityScheme
+							{
+								In = ParameterLocation.Header,
+								Name = JwtBearerDefaults.AuthenticationScheme,
+								Scheme = "oauth2",
+								Reference = new OpenApiReference
+								{
+									Type = ReferenceType.SecurityScheme,
+									Id = JwtBearerDefaults.AuthenticationScheme
+								}
+							},
+							new List<String>()
+						}
+					});
+				});
+
+			AddAuthentication(services);
+		}
+
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		{
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
+
+			app.UseCors(builder => builder
+				.AllowAnyHeader()
+				.AllowAnyMethod()
+				.AllowAnyOrigin()
+			);
+
+			app.UseHttpsRedirection();
+
+			app.UseRouting();
+
+			app.UseAuthentication();
+			app.UseAuthorization();
+
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+			});
+
+			app.UseSwagger();
+			app.UseSwaggerUI(options =>
+			{
+				options.RoutePrefix = "";
+				options.SwaggerEndpoint("/swagger/main/swagger.json", "WalletKeeperAPI");
+			});
+		}
+
+		public void AddAuthentication(IServiceCollection services)
+		{
 			services
 				.AddIdentity<User, Role>(options =>
 				{
@@ -103,88 +183,14 @@ namespace WalletKeeper.WebAPI
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true,
-						ValidIssuer = AuthOptions.Issuer,
-						ValidateAudience = true,
-						ValidAudiences = AuthOptions.Audiences,
+						ValidIssuer = EndpointConfig.Issuer,
+						ValidateAudience = false,
+						//ValidAudiences = EndpointConfig.Audiences,
 						ValidateLifetime = true,
 						ValidateIssuerSigningKey = true,
-						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AuthOptions.Secret))
+						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(EndpointConfig.Secret))
 					};
 				});
-
-			services
-				.AddSwaggerGen(options =>
-				{
-					options.SwaggerDoc("main", new OpenApiInfo
-					{
-						Version = System.Reflection.Assembly
-							.GetEntryAssembly()
-							.GetName()
-							.Version
-							.ToString(),
-						Title = "WalletKeeperAPI",
-						Description = "Wallet Keeper WebAPI"
-					});
-
-					options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
-					{
-						In = ParameterLocation.Header,
-						Description = "Please enter into field the word 'Bearer' following by space and JWT",
-						Name = "Authorization",
-						Type = SecuritySchemeType.ApiKey
-					});
-
-					options.AddSecurityRequirement(new OpenApiSecurityRequirement
-					{
-						{
-							new OpenApiSecurityScheme
-							{
-								In = ParameterLocation.Header,
-								Name = JwtBearerDefaults.AuthenticationScheme,
-								Scheme = "oauth2",
-								Reference = new OpenApiReference
-								{
-									Type = ReferenceType.SecurityScheme,
-									Id = JwtBearerDefaults.AuthenticationScheme
-								}
-							},
-							new List<String>()
-						}
-					});
-				});
-		}
-
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-
-			app.UseCors(builder => builder
-				.AllowAnyHeader()
-				.AllowAnyMethod()
-				.AllowAnyOrigin()
-			);
-
-			app.UseHttpsRedirection();
-
-			app.UseRouting();
-
-			app.UseAuthentication();
-			app.UseAuthorization();
-
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapControllers();
-			});
-
-			app.UseSwagger();
-			app.UseSwaggerUI(options =>
-			{
-				options.RoutePrefix = "";
-				options.SwaggerEndpoint("/swagger/main/swagger.json", "WalletKeeperAPI");
-			});
 		}
 	}
 }

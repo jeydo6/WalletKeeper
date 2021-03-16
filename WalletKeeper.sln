@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.Barcodes", "Wa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.Domain", "WalletKeeper.Domain\WalletKeeper.Domain.csproj", "{2F75D625-9ED0-478C-BCA2-D7B507A6B770}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletKeeper.Persistence", "WalletKeeper.Persistence\WalletKeeper.Persistence.csproj", "{053A1637-F1E6-4356-9770-FB489F2B54B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.Persistence", "WalletKeeper.Persistence\WalletKeeper.Persistence.csproj", "{053A1637-F1E6-4356-9770-FB489F2B54B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletKeeper.WebAPI", "WalletKeeper.WebAPI\WalletKeeper.WebAPI.csproj", "{7778A970-931B-44C3-8A5D-EA47EF91F2E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.WebAPI", "WalletKeeper.WebAPI\WalletKeeper.WebAPI.csproj", "{7778A970-931B-44C3-8A5D-EA47EF91F2E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletKeeper.Application", "WalletKeeper.Application\WalletKeeper.Application.csproj", "{63F1127C-B9E8-412E-8984-437680CE949E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7778A970-931B-44C3-8A5D-EA47EF91F2E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7778A970-931B-44C3-8A5D-EA47EF91F2E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7778A970-931B-44C3-8A5D-EA47EF91F2E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63F1127C-B9E8-412E-8984-437680CE949E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63F1127C-B9E8-412E-8984-437680CE949E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63F1127C-B9E8-412E-8984-437680CE949E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63F1127C-B9E8-412E-8984-437680CE949E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

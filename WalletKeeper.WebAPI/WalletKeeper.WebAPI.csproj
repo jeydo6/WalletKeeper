@@ -22,6 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\WalletKeeper.Application\WalletKeeper.Application.csproj" />
 	  <ProjectReference Include="..\WalletKeeper.Domain\WalletKeeper.Domain.csproj" />
 	  <ProjectReference Include="..\WalletKeeper.Persistence\WalletKeeper.Persistence.csproj" />
 	</ItemGroup>
