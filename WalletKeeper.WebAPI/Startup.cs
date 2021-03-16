@@ -53,9 +53,9 @@ namespace WalletKeeper.WebAPI
 				);
 
 			services
-				.AddDbContext<IdentityDbContext>(options =>
+				.AddDbContext<ApplicationDbContext>(options =>
 					options.UseSqlServer(
-						Configuration.GetConnectionString("IdentityConnection")
+						Configuration.GetConnectionString("DbConnection")
 					)
 				);
 
@@ -165,7 +165,7 @@ namespace WalletKeeper.WebAPI
 						DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5)
 					};
 				})
-				.AddEntityFrameworkStores<IdentityDbContext>()
+				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 
 			services

@@ -9,10 +9,10 @@ using WalletKeeper.Domain.Entities;
 
 namespace WalletKeeper.Persistence.DbContexts
 {
-	public class IdentityDbContext : IdentityDbContext<User, Role, Guid>
+	public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
 	{
-		public IdentityDbContext(
-			DbContextOptions<IdentityDbContext> options
+		public ApplicationDbContext(
+			DbContextOptions<ApplicationDbContext> options
 		) : base(options)
 		{
 			//

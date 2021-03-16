@@ -9,8 +9,8 @@ using WalletKeeper.Persistence.DbContexts;
 
 namespace WalletKeeper.Persistence.Migrations
 {
-    [DbContext(typeof(IdentityDbContext))]
-    [Migration("20210316130748_Migration0")]
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20210316203630_Migration0")]
     partial class Migration0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
