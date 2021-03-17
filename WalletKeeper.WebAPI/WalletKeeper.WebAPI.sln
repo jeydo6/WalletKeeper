@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.Persistence", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.WebAPI", "WalletKeeper.WebAPI\WalletKeeper.WebAPI.csproj", "{7778A970-931B-44C3-8A5D-EA47EF91F2E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletKeeper.Application", "WalletKeeper.Application\WalletKeeper.Application.csproj", "{63F1127C-B9E8-412E-8984-437680CE949E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.Application", "WalletKeeper.Application\WalletKeeper.Application.csproj", "{63F1127C-B9E8-412E-8984-437680CE949E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
