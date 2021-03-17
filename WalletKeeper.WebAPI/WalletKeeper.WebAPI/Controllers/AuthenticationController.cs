@@ -15,6 +15,7 @@ using WalletKeeper.WebAPI.Configs;
 
 namespace WalletKeeper.WebAPI.Controllers
 {
+	[Authorize]
 	[ApiController]
 	[Route("authentication")]
 	public class AuthenticationController : ControllerBase
@@ -37,7 +38,8 @@ namespace WalletKeeper.WebAPI.Controllers
 			_logger = logger;
 		}
 
-		[HttpPost("token")]
+		[AllowAnonymous]
+		[HttpPost]
 		[Produces(typeof(String))]
 		public async Task<IActionResult> GetTokenAsync(LoginDto login)
 		{
@@ -81,8 +83,7 @@ namespace WalletKeeper.WebAPI.Controllers
 			);
 		}
 
-		[Authorize]
-		[HttpGet("userInfo")]
+		[HttpGet]
 		[Produces(typeof(UserInfoDto))]
 		public IActionResult GetClaims()
 		{

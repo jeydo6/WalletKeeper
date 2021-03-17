@@ -1,10 +1,18 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 
 namespace WalletKeeper.Domain.Entities
 {
-	public class ReceiptHeader
+	[Table("Receipts")]
+	[Index(nameof(FiscalDocumentNumber), IsUnique = true)]
+	public class Receipt
 	{
+		[Key]
+		public Int32 ID { get; set; }
+
 		public String FiscalDocumentNumber { get; set; }
 
 		public String FiscalDriveNumber { get; set; }
@@ -17,7 +25,7 @@ namespace WalletKeeper.Domain.Entities
 
 		public Int32 OperationType { get; set; }
 
-		public static ReceiptHeader Parse(String s)
+		public static Receipt Parse(String s)
 		{
 			try
 			{
@@ -56,7 +64,7 @@ namespace WalletKeeper.Domain.Entities
 					}
 				}
 
-				return new ReceiptHeader
+				return new Receipt
 				{
 					FiscalDocumentNumber = fiscalDocumentNumber,
 					FiscalDriveNumber = fiscalDriveNumber,

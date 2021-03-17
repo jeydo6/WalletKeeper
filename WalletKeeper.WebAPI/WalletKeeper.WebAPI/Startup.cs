@@ -12,6 +12,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
 using WalletKeeper.Persistence.DbContexts;
@@ -58,6 +59,9 @@ namespace WalletKeeper.WebAPI
 						Configuration.GetConnectionString("DbConnection")
 					)
 				);
+
+			services
+				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>();
 
 			services
 				.AddSwaggerGen(options =>

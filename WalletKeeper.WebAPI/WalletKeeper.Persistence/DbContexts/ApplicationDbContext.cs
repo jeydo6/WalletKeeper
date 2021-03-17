@@ -18,6 +18,8 @@ namespace WalletKeeper.Persistence.DbContexts
 			//
 		}
 
+		public DbSet<Receipt> Receipts { get; set; }
+
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);

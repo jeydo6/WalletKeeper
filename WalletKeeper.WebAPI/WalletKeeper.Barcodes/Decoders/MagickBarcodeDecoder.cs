@@ -6,12 +6,12 @@ using ZXing;
 
 namespace WalletKeeper.Barcodes.Decoders
 {
-	public class MagickBarcodeDecoder
+	public class MagickBarcodeDecoder : IBarcodeDecoder
 	{
 		private readonly MagickBarcodeReader _reader;
 		private readonly Func<IMagickImage, Result>[] _methods;
 
-		public MagickBarcodeDecoder(BarcodeFormatEnum barcodeFormat)
+		public MagickBarcodeDecoder()
 		{
 			_methods = new Func<IMagickImage, Result>[]
 			{
@@ -24,7 +24,7 @@ namespace WalletKeeper.Barcodes.Decoders
 			_reader = new MagickBarcodeReader();
 			_reader.Options.PossibleFormats = new BarcodeFormat[]
 			{
-				(BarcodeFormat)barcodeFormat
+				BarcodeFormat.QR_CODE
 			};
 			_reader.Options.TryHarder = true;
 		}
