@@ -19,6 +19,10 @@ namespace WalletKeeper.Persistence.DbContexts
 		}
 
 		public DbSet<Receipt> Receipts { get; set; }
+		
+		public DbSet<Organization> Organizations { get; set; }
+		
+		public DbSet<Product> Products { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

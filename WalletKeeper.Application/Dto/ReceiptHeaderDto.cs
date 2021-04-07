@@ -2,7 +2,7 @@
 
 namespace WalletKeeper.Application.Dto
 {
-	public class ReceiptDto
+	public class ReceiptHeaderDto
 	{
 		public String FiscalDocumentNumber { get; set; }
 

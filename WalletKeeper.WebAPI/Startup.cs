@@ -15,6 +15,8 @@ using System.Text;
 using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
+using WalletKeeper.Domain.Services;
+using WalletKeeper.Infrastructure.Services;
 using WalletKeeper.Persistence.DbContexts;
 using WalletKeeper.WebAPI.Configs;
 
@@ -62,6 +64,9 @@ namespace WalletKeeper.WebAPI
 
 			services
 				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>();
+
+			services
+				.AddSingleton<IFiscalDataService, FiscalDataService>();
 
 			services
 				.AddSwaggerGen(options =>

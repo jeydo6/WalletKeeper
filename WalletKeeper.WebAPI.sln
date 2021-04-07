@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.WebAPI", "Wall
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletKeeper.Application", "WalletKeeper.Application\WalletKeeper.Application.csproj", "{63F1127C-B9E8-412E-8984-437680CE949E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletKeeper.Infrastructure", "WalletKeeper.Infrastructure\WalletKeeper.Infrastructure.csproj", "{F2A00369-3C4A-40DA-A3CD-4D9505F1A6AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{63F1127C-B9E8-412E-8984-437680CE949E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63F1127C-B9E8-412E-8984-437680CE949E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63F1127C-B9E8-412E-8984-437680CE949E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2A00369-3C4A-40DA-A3CD-4D9505F1A6AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2A00369-3C4A-40DA-A3CD-4D9505F1A6AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2A00369-3C4A-40DA-A3CD-4D9505F1A6AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2A00369-3C4A-40DA-A3CD-4D9505F1A6AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Domain.Entities;
+using WalletKeeper.Domain.Services;
 using WalletKeeper.Persistence.DbContexts;
 
 namespace WalletKeeper.WebAPI.Controllers
@@ -19,49 +20,60 @@ namespace WalletKeeper.WebAPI.Controllers
 	{
 		private readonly ApplicationDbContext _dbContext;
 		private readonly IBarcodeDecoder _barcodeDecoder;
+		private readonly IFiscalDataService _fiscalDataService;
 		private readonly ILogger<ReceiptsController> _logger;
 
 		public ReceiptsController(
 			ApplicationDbContext dbContext,
 			IBarcodeDecoder barcodeDecoder,
+			IFiscalDataService fiscalDataService,
 			ILogger<ReceiptsController> logger
 		)
 		{
 			_dbContext = dbContext;
 			_barcodeDecoder = barcodeDecoder;
+			_fiscalDataService = fiscalDataService;
 			_logger = logger;
 		}
 
 		[HttpPost]
-		[Produces(typeof(ReceiptDto))]
+		[Produces(typeof(ReceiptHeaderDto))]
 		public async Task<IActionResult> CreateReceipt(GenericDto<Byte[]> receiptPhoto)
 		{
 			var barcodeString = _barcodeDecoder.Decode(receiptPhoto.Value);
-			var dto = Parse(barcodeString);
+			var receiptHeader = Parse(barcodeString);
 
-			var entity = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == dto.FiscalDocumentNumber);
-			if (entity != null)
+			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == receiptHeader.FiscalDocumentNumber);
+			if (receipt != null)
 			{
 				return BadRequest("Receipt already exists!");
 			}
 
-			entity = new Receipt
-			{
-				FiscalDocumentNumber = dto.FiscalDocumentNumber,
-				FiscalDriveNumber = dto.FiscalDriveNumber,
-				FiscalType = dto.FiscalType,
-				DateTime = dto.DateTime,
-				OperationType = dto.OperationType,
-				TotalSum = dto.TotalSum
-			};
+			receipt = await _fiscalDataService.GetReceipt(receiptHeader);
 
-			await _dbContext.Receipts.AddAsync(entity);
+			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
+			if (organization != null)
+			{
+				receipt.Organization = organization;
+			}
+
+			await _dbContext.Receipts.AddAsync(receipt);
 			await _dbContext.SaveChangesAsync();
 
-			return Ok(dto);
+			var result = new ReceiptHeaderDto
+			{
+				FiscalDocumentNumber = receipt.FiscalDocumentNumber,
+				FiscalDriveNumber = receipt.FiscalDriveNumber,
+				FiscalType = receipt.FiscalType,
+				DateTime = receipt.DateTime,
+				OperationType = receipt.OperationType,
+				TotalSum = receipt.TotalSum
+			};
+
+			return Ok(result);
 		}
 
-		public static ReceiptDto Parse(String barcodeString)
+		private static Receipt Parse(String barcodeString)
 		{
 			if (String.IsNullOrEmpty(barcodeString))
 			{
@@ -108,7 +120,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				}
 			}
 
-			return new ReceiptDto
+			return new Receipt
 			{
 				FiscalDocumentNumber = fiscalDocumentNumber,
 				FiscalDriveNumber = fiscalDriveNumber,

@@ -1,0 +1,25 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WalletKeeper.Domain.Entities
+{
+	[Table("Products")]
+	public class Product
+	{
+		[Key]
+		public Int32 ID { get; set; }
+
+		public String Name { get; set; }
+
+		public Decimal Price { get; set; }
+
+		public Decimal Quantity { get; set; }
+
+		public Decimal Sum { get; set; }
+
+		public Int32 ReceiptID { get; set; }
+
+		public Receipt Receipt { get; set; }
+	}
+}
