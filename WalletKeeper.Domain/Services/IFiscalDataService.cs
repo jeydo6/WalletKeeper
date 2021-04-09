@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using WalletKeeper.Barcodes.Types;
 using WalletKeeper.Domain.Entities;
 
 namespace WalletKeeper.Domain.Services
 {
 	public interface IFiscalDataService
 	{
-		Task<Receipt> GetReceipt(ReceiptHeader receiptHeader);
+		Task<Receipt> GetReceipt(QRCode qrcode);
 	}
 }

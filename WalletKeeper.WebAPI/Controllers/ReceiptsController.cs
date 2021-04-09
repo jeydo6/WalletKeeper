@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Globalization;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Barcodes.Decoders;
-using WalletKeeper.Domain.Entities;
+using WalletKeeper.Barcodes.Types;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Persistence.DbContexts;
 
@@ -37,19 +36,19 @@ namespace WalletKeeper.WebAPI.Controllers
 		}
 
 		[HttpPost]
-		[Produces(typeof(ReceiptHeaderDto))]
+		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> CreateReceipt(GenericDto<Byte[]> receiptPhoto)
 		{
 			var barcodeString = _barcodeDecoder.Decode(receiptPhoto.Value);
-			var receiptHeader = Parse(barcodeString);
+			var qrcode = QRCode.Parse(barcodeString);
 
-			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == receiptHeader.FiscalDocumentNumber);
+			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == qrcode.FiscalDocumentNumber);
 			if (receipt != null)
 			{
 				return BadRequest("Receipt already exists!");
 			}
 
-			receipt = await _fiscalDataService.GetReceipt(receiptHeader);
+			receipt = await _fiscalDataService.GetReceipt(qrcode);
 
 			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
 			if (organization != null)
@@ -60,7 +59,7 @@ namespace WalletKeeper.WebAPI.Controllers
 			await _dbContext.Receipts.AddAsync(receipt);
 			await _dbContext.SaveChangesAsync();
 
-			var result = new ReceiptHeaderDto
+			var result = new ReceiptDto
 			{
 				FiscalDocumentNumber = receipt.FiscalDocumentNumber,
 				FiscalDriveNumber = receipt.FiscalDriveNumber,
@@ -71,64 +70,6 @@ namespace WalletKeeper.WebAPI.Controllers
 			};
 
 			return Ok(result);
-		}
-
-		private static Receipt Parse(String barcodeString)
-		{
-			if (String.IsNullOrEmpty(barcodeString))
-			{
-				throw new ArgumentNullException(barcodeString);
-			}
-
-			if (!barcodeString.Contains("&"))
-			{
-				throw new ArgumentException(barcodeString);
-			}
-
-			String fiscalDocumentNumber = default;
-			String fiscalDriveNumber = default;
-			String fiscalType = default;
-			DateTime dateTime = default;
-			Decimal totalSum = default;
-			Int32 operationType = default;
-
-			foreach (var item in barcodeString.Split('&', StringSplitOptions.RemoveEmptyEntries))
-			{
-				if (item.StartsWith("i="))
-				{
-					fiscalDocumentNumber = item[2..];
-				}
-				else if (item.StartsWith("fn="))
-				{
-					fiscalDriveNumber = item[3..];
-				}
-				else if (item.StartsWith("fp="))
-				{
-					fiscalType = item[3..];
-				}
-				else if (item.StartsWith("t="))
-				{
-					dateTime = DateTime.ParseExact(item[2..], "yyyyMMddTHHmm", CultureInfo.InvariantCulture);
-				}
-				else if (item.StartsWith("s="))
-				{
-					totalSum = Decimal.Parse(item[2..], CultureInfo.InvariantCulture);
-				}
-				else if (item.StartsWith("n="))
-				{
-					operationType = Int32.Parse(item[2..]);
-				}
-			}
-
-			return new Receipt
-			{
-				FiscalDocumentNumber = fiscalDocumentNumber,
-				FiscalDriveNumber = fiscalDriveNumber,
-				FiscalType = fiscalType,
-				DateTime = dateTime,
-				TotalSum = totalSum,
-				OperationType = operationType
-			};
 		}
 	}
 }
