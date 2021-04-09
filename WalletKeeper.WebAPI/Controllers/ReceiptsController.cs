@@ -42,18 +42,30 @@ namespace WalletKeeper.WebAPI.Controllers
 			var barcodeString = _barcodeDecoder.Decode(receiptPhoto.Value);
 			var qrcode = QRCode.Parse(barcodeString);
 
-			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == qrcode.FiscalDocumentNumber);
-			if (receipt != null)
+			var receiptEntity = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == qrcode.FiscalDocumentNumber);
+			if (receiptEntity != null)
 			{
 				return BadRequest("Receipt already exists!");
 			}
 
-			receipt = await _fiscalDataService.GetReceipt(qrcode);
+			var receipt = await _fiscalDataService.GetReceipt(qrcode);
 
-			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
-			if (organization != null)
+			var organizationEntity = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
+			if (organizationEntity != null)
 			{
-				receipt.Organization = organization;
+				receipt.OrganizationID = organizationEntity.ID;
+				receipt.Organization = null;
+			}
+
+			foreach (var productItem in receipt.ProductItems)
+			{
+				var productItemEntity = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.Name == productItem.Name && pi.ProductID != null);
+
+				if (productItemEntity != null)
+				{
+					productItem.ProductID = productItemEntity.ProductID;
+					productItem.Product = null;
+				}
 			}
 
 			await _dbContext.Receipts.AddAsync(receipt);

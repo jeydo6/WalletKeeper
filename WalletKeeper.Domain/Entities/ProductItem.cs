@@ -21,5 +21,9 @@ namespace WalletKeeper.Domain.Entities
 		public Int32 ReceiptID { get; set; }
 
 		public Receipt Receipt { get; set; }
+
+		public Int32? ProductID { get; set; }
+
+		public Product Product { get; set; }
 	}
 }
