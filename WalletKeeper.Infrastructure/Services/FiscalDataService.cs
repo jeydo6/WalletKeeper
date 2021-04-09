@@ -32,8 +32,8 @@ namespace WalletKeeper.Infrastructure.Services
 				}
 			};
 
-			receipt.Products = jsonData["items"]
-				.Select(jt => new Product
+			receipt.ProductItems = jsonData["items"]
+				.Select(jt => new ProductItem
 				{
 					Name = jt.Value<String>("name"),
 					Price = jt.Value<Decimal>("price") / 100,

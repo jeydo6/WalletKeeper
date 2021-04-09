@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WalletKeeper.Domain.Entities
 {
-	[Table("Products")]
-	public class Product
+	[Table("ProductItems")]
+	public class ProductItem
 	{
 		[Key]
 		public Int32 ID { get; set; }

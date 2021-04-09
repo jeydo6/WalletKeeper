@@ -22,7 +22,7 @@ namespace WalletKeeper.Persistence.DbContexts
 		
 		public DbSet<Organization> Organizations { get; set; }
 		
-		public DbSet<Product> Products { get; set; }
+		public DbSet<ProductItem> ProductItems { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

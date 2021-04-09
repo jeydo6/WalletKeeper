@@ -12,7 +12,7 @@ namespace WalletKeeper.Domain.Entities
 	{
 		public Receipt()
 		{
-			Products = new List<Product>();
+			ProductItems = new List<ProductItem>();
 		}
 
 		[Key]
@@ -36,6 +36,6 @@ namespace WalletKeeper.Domain.Entities
 
 		public Organization Organization { get; set; }
 
-		public List<Product> Products { get; set; }
+		public List<ProductItem> ProductItems { get; set; }
 	}
 }
