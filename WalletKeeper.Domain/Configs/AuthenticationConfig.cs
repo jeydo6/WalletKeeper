@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace WalletKeeper.WebAPI.Configs
+namespace WalletKeeper.Domain.Configs
 {
-	public class EndpointConfig
+	public class AuthenticationConfig
 	{
 		public String Issuer { get; set; }
 

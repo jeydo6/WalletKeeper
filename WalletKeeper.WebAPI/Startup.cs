@@ -13,12 +13,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using WalletKeeper.Barcodes.Decoders;
+using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Infrastructure.Services;
 using WalletKeeper.Persistence.DbContexts;
-using WalletKeeper.WebAPI.Configs;
+using WalletKeeper.WebAPI.Options;
 
 namespace WalletKeeper.WebAPI
 {
@@ -31,15 +32,9 @@ namespace WalletKeeper.WebAPI
 			Log.Logger = new LoggerConfiguration()
 				.ReadFrom.Configuration(Configuration)
 				.CreateLogger();
-
-			EndpointConfig = Configuration
-				.GetSection("EndpointConfig")
-				.Get<EndpointConfig>();
 		}
 
 		public IConfiguration Configuration { get; }
-
-		private EndpointConfig EndpointConfig { get; }
 
 		public void ConfigureServices(IServiceCollection services)
 		{
@@ -51,8 +46,11 @@ namespace WalletKeeper.WebAPI
 				.AddOptions();
 
 			services
-				.Configure<EndpointConfig>(
-					Configuration.GetSection("EndpointConfig")
+				.Configure<AuthenticationConfig>(
+					Configuration.GetSection($"{nameof(AuthenticationConfig)}")
+				)
+				.Configure<FiscalDataServiceConfig>(
+					Configuration.GetSection($"{nameof(FiscalDataServiceConfig)}")
 				);
 
 			services
@@ -61,6 +59,14 @@ namespace WalletKeeper.WebAPI
 						Configuration.GetConnectionString("DbConnection")
 					)
 				);
+
+			services
+				.AddHttpClient<IBarcodeDecoder, MagickBarcodeDecoder>((sp, httpClient) =>
+				{
+					var config = sp.GetRequiredService<FiscalDataServiceConfig>();
+
+					httpClient.BaseAddress = new Uri(config.Address);
+				});
 
 			services
 				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>();
@@ -109,7 +115,13 @@ namespace WalletKeeper.WebAPI
 					});
 				});
 
-			AddAuthentication(services);
+			services
+				.AddAuthentication(options =>
+				{
+					options.AuthenticationConfig = Configuration
+						.GetSection($"{nameof(AuthenticationConfig)}")
+						.Get<AuthenticationConfig>();
+				});
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -144,9 +156,17 @@ namespace WalletKeeper.WebAPI
 				options.SwaggerEndpoint("/swagger/main/swagger.json", "WalletKeeperAPI");
 			});
 		}
+	}
 
-		public void AddAuthentication(IServiceCollection services)
+	internal static class StartupExtension
+	{
+		public static void AddAuthentication(this IServiceCollection services, Action<AuthenticationOptions> configureOptions)
 		{
+			var options = new AuthenticationOptions();
+			configureOptions(options);
+
+			var config = options.AuthenticationConfig;
+
 			services
 				.AddIdentity<User, Role>(options =>
 				{
@@ -192,12 +212,11 @@ namespace WalletKeeper.WebAPI
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true,
-						ValidIssuer = EndpointConfig.Issuer,
+						ValidIssuer = config.Issuer,
 						ValidateAudience = false,
-						//ValidAudiences = EndpointConfig.Audiences,
 						ValidateLifetime = true,
 						ValidateIssuerSigningKey = true,
-						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(EndpointConfig.Secret))
+						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Secret))
 					};
 				});
 		}

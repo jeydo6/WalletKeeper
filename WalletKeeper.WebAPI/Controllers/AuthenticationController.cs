@@ -10,8 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
+using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
-using WalletKeeper.WebAPI.Configs;
 
 namespace WalletKeeper.WebAPI.Controllers
 {
@@ -21,19 +21,19 @@ namespace WalletKeeper.WebAPI.Controllers
 	public class AuthenticationController : ControllerBase
 	{
 		private readonly UserManager<User> _userManager;
-		private readonly EndpointConfig _endpointConfig;
+		private readonly AuthenticationConfig _authenticationConfig;
 		private readonly IUserClaimsPrincipalFactory<User> _claimsPrincipalFactory;
 		private readonly ILogger<AuthenticationController> _logger;
 
 		public AuthenticationController(
 			UserManager<User> userManager,
-			IOptionsSnapshot<EndpointConfig> endpointConfigOptions,
+			IOptionsSnapshot<AuthenticationConfig> authenticationConfigOptions,
 			IUserClaimsPrincipalFactory<User> claimsPrincipalFactory,
 			ILogger<AuthenticationController> logger
 		)
 		{
 			_userManager = userManager;
-			_endpointConfig = endpointConfigOptions.Value;
+			_authenticationConfig = authenticationConfigOptions.Value;
 			_claimsPrincipalFactory = claimsPrincipalFactory;
 			_logger = logger;
 		}
@@ -66,11 +66,11 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 
 			var key = new SymmetricSecurityKey(
-				Encoding.UTF8.GetBytes(_endpointConfig.Secret)
+				Encoding.UTF8.GetBytes(_authenticationConfig.Secret)
 			);
 
 			var jwt = new JwtSecurityToken(
-				issuer: _endpointConfig.Issuer,
+				issuer: _authenticationConfig.Issuer,
 				notBefore: DateTime.UtcNow,
 				expires: DateTime.UtcNow.AddDays(14),
 				claims: identity.Claims,
