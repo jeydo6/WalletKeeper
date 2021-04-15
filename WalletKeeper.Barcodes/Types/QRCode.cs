@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 namespace WalletKeeper.Barcodes.Types
 {
@@ -16,11 +15,11 @@ namespace WalletKeeper.Barcodes.Types
 
 		public String FiscalType { get; private set; }
 
-		public DateTime DateTime { get; private set; }
+		public String DateTime { get; private set; }
 
-		public Decimal TotalSum { get; private set; }
+		public String TotalSum { get; private set; }
 
-		public Int32 OperationType { get; private set; }
+		public String OperationType { get; private set; }
 
 		public static QRCode Parse(String qrcodeString)
 		{
@@ -34,50 +33,37 @@ namespace WalletKeeper.Barcodes.Types
 				throw new ArgumentException(qrcodeString);
 			}
 
-			String fiscalDocumentNumber = default;
-			String fiscalDriveNumber = default;
-			String fiscalType = default;
-			DateTime dateTime = default;
-			Decimal totalSum = default;
-			Int32 operationType = default;
+			var qrcode = new QRCode();
 
 			foreach (var item in qrcodeString.Split('&', StringSplitOptions.RemoveEmptyEntries))
 			{
 				if (item.StartsWith("i="))
 				{
-					fiscalDocumentNumber = item[2..];
+					qrcode.FiscalDocumentNumber = item[2..];
 				}
 				else if (item.StartsWith("fn="))
 				{
-					fiscalDriveNumber = item[3..];
+					qrcode.FiscalDriveNumber = item[3..];
 				}
 				else if (item.StartsWith("fp="))
 				{
-					fiscalType = item[3..];
+					qrcode.FiscalType = item[3..];
 				}
 				else if (item.StartsWith("t="))
 				{
-					dateTime = DateTime.ParseExact(item[2..], "yyyyMMddTHHmm", CultureInfo.InvariantCulture);
+					qrcode.DateTime = item[2..];
 				}
 				else if (item.StartsWith("s="))
 				{
-					totalSum = Decimal.Parse(item[2..], CultureInfo.InvariantCulture);
+					qrcode.TotalSum = item[2..];
 				}
 				else if (item.StartsWith("n="))
 				{
-					operationType = Int32.Parse(item[2..]);
+					qrcode.OperationType = item[2..];
 				}
 			}
 
-			return new QRCode
-			{
-				FiscalDocumentNumber = fiscalDocumentNumber,
-				FiscalDriveNumber = fiscalDriveNumber,
-				FiscalType = fiscalType,
-				DateTime = dateTime,
-				TotalSum = totalSum,
-				OperationType = operationType
-			};
+			return qrcode;
 		}
 	}
 }

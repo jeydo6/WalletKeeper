@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -61,18 +62,16 @@ namespace WalletKeeper.WebAPI
 				);
 
 			services
-				.AddHttpClient<IBarcodeDecoder, MagickBarcodeDecoder>((sp, httpClient) =>
+				.AddHttpClient<IFiscalDataService, FiscalDataService>((sp, httpClient) =>
 				{
-					var config = sp.GetRequiredService<FiscalDataServiceConfig>();
+					var configOptions = sp.GetRequiredService<IOptions<FiscalDataServiceConfig>>();
+					var config = configOptions.Value;
 
 					httpClient.BaseAddress = new Uri(config.Address);
 				});
 
 			services
 				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>();
-
-			services
-				.AddSingleton<IFiscalDataService, FiscalDataService>();
 
 			services
 				.AddSwaggerGen(options =>
