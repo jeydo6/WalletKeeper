@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Mime;
-using System.Text;
 using System.Threading.Tasks;
 using WalletKeeper.Barcodes.Types;
 using WalletKeeper.Domain.Configs;
@@ -51,11 +48,18 @@ namespace WalletKeeper.Infrastructure.Services
 
 			var responseContent = await response.Content.ReadAsStringAsync();
 
-			var code = JObject.Parse(responseContent).Value<Int32>("code");
+			var receipt = Parse(responseContent);
+
+			return receipt;
+		}
+
+		private static Receipt Parse(String jsonString)
+		{
+			var code = JObject.Parse(jsonString).Value<Int32>("code");
 
 			if (code == 1)
 			{
-				var jObject = JObject.Parse(responseContent)["data"]["json"];
+				var jObject = JObject.Parse(jsonString)["data"]["json"];
 
 				var receipt = new Receipt
 				{
@@ -74,12 +78,13 @@ namespace WalletKeeper.Infrastructure.Services
 				};
 
 				receipt.ProductItems = jObject["items"]
-					.Select(jt => new ProductItem
+					.GroupBy(jt => jt.Value<String>("name"))
+					.Select(g => new ProductItem
 					{
-						Name = jt.Value<String>("name"),
-						Price = jt.Value<Decimal>("price") / 100,
-						Quantity = jt.Value<Decimal>("quantity"),
-						Sum = jt.Value<Decimal>("sum") / 100,
+						Name = g.Key,
+						Price = g.Sum(jt => jt.Value<Decimal>("price")) / 100,
+						Quantity = g.Sum(jt => jt.Value<Decimal>("quantity")),
+						Sum = g.Sum(jt => jt.Value<Decimal>("sum")) / 100,
 						Receipt = receipt
 					})
 					.ToList();
@@ -88,7 +93,7 @@ namespace WalletKeeper.Infrastructure.Services
 			}
 			else
 			{
-				var message = JObject.Parse(responseContent).Value<String>("data");
+				var message = JObject.Parse(jsonString).Value<String>("data");
 
 				throw new HttpRequestException(message);
 			}
