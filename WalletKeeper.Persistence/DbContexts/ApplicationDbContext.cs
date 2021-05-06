@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using WalletKeeper.Domain.Entities;
 
 namespace WalletKeeper.Persistence.DbContexts
@@ -32,14 +29,14 @@ namespace WalletKeeper.Persistence.DbContexts
 		{
 			base.OnModelCreating(modelBuilder);
 
-			IEnumerable<IMutableForeignKey> foreignKeys = modelBuilder.Model
-				.GetEntityTypes()
-				.SelectMany(et => et.GetForeignKeys());
+			//IEnumerable<IMutableForeignKey> foreignKeys = modelBuilder.Model
+			//	.GetEntityTypes()
+			//	.SelectMany(et => et.GetForeignKeys());
 
-			foreach (IMutableForeignKey foreignKey in foreignKeys)
-			{
-				foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
-			}
+			//foreach (IMutableForeignKey foreignKey in foreignKeys)
+			//{
+			//	foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+			//}
 
 			modelBuilder.Entity<User>()
 				.ToTable("Users");

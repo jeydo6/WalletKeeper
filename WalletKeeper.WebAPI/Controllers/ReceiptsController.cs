@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Barcodes.Types;
+using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Persistence.DbContexts;
 
@@ -38,7 +39,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 		[HttpPost("photo")]
 		[Produces(typeof(ReceiptDto))]
-		public async Task<IActionResult> CreateReceiptByPhoto(GenericDto<Byte[]> dto)
+		public async Task<IActionResult> PostPhoto(GenericDto<Byte[]> dto)
 		{
 			try
 			{
@@ -49,7 +50,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				return Ok(result);
 
 			}
-			catch (Exception ex)
+			catch (BusinessException ex)
 			{
 				return BadRequest(ex.Message);
 			}
@@ -57,7 +58,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 		[HttpPost("barcode")]
 		[Produces(typeof(ReceiptDto))]
-		public async Task<IActionResult> CreateReceiptByBarcode(GenericDto<String> dto)
+		public async Task<IActionResult> PostBarcode(GenericDto<String> dto)
 		{
 			try
 			{
@@ -68,7 +69,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				return Ok(result);
 
 			}
-			catch (Exception ex)
+			catch (BusinessException ex)
 			{
 				return BadRequest(ex.Message);
 			}
@@ -78,30 +79,30 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			var qrcode = QRCode.Parse(barcodeString);
 
-			var receiptEntity = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == qrcode.FiscalDocumentNumber);
-			if (receiptEntity != null)
+			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == qrcode.FiscalDocumentNumber);
+			if (receipt != null)
 			{
-				throw new Exception("Receipt already exists!");
+				throw new BusinessException("Receipt already exists!");
 			}
 
-			var receipt = await _fiscalDataService.GetReceipt(qrcode);
+			receipt = await _fiscalDataService.GetReceipt(qrcode);
 
-			var organizationEntity = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
-			if (organizationEntity != null)
+			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
+			if (organization != null)
 			{
-				receipt.OrganizationID = organizationEntity.ID;
+				receipt.OrganizationID = organization.ID;
 				receipt.Organization = null;
 			}
 
-			var productItemEntities = await _dbContext.ProductItems.ToListAsync();
-			foreach (var productItem in receipt.ProductItems)
+			var productItems = await _dbContext.ProductItems.ToListAsync();
+			foreach (var item in receipt.ProductItems)
 			{
-				var productItemEntity = productItemEntities.FirstOrDefault(pi => pi.Name == productItem.Name && pi.ProductID != null);
+				var productItem = productItems.FirstOrDefault(pi => pi.Name == item.Name && pi.ProductID != null);
 
-				if (productItemEntity != null)
+				if (productItem != null)
 				{
-					productItem.ProductID = productItemEntity.ProductID;
-					productItem.Product = null;
+					item.ProductID = productItem.ProductID;
+					item.Product = null;
 				}
 			}
 

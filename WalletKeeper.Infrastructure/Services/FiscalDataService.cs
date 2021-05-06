@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WalletKeeper.Barcodes.Types;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
+using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Services;
 
 namespace WalletKeeper.Infrastructure.Services
@@ -95,7 +96,7 @@ namespace WalletKeeper.Infrastructure.Services
 			{
 				var message = JObject.Parse(jsonString).Value<String>("data");
 
-				throw new Exception(message);
+				throw new BusinessException(message);
 			}
 		}
 	}
