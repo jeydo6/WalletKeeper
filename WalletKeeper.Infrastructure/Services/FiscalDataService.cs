@@ -95,7 +95,7 @@ namespace WalletKeeper.Infrastructure.Services
 			{
 				var message = JObject.Parse(jsonString).Value<String>("data");
 
-				throw new HttpRequestException(message);
+				throw new Exception(message);
 			}
 		}
 	}

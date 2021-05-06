@@ -40,63 +40,48 @@ namespace WalletKeeper.WebAPI.Controllers
 		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> CreateReceiptByPhoto(GenericDto<Byte[]> dto)
 		{
-			var barcodeString = _barcodeDecoder.Decode(dto.Value);
-			var qrcode = QRCode.Parse(barcodeString);
-
-			var receiptEntity = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == qrcode.FiscalDocumentNumber);
-			if (receiptEntity != null)
+			try
 			{
-				return BadRequest("Receipt already exists!");
+				var barcodeString = _barcodeDecoder.Decode(dto.Value);
+
+				var result = await CreateReceipt(barcodeString);
+
+				return Ok(result);
+
 			}
-
-			var receipt = await _fiscalDataService.GetReceipt(qrcode);
-
-			var organizationEntity = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
-			if (organizationEntity != null)
+			catch (Exception ex)
 			{
-				receipt.OrganizationID = organizationEntity.ID;
-				receipt.Organization = null;
+				return BadRequest(ex.Message);
 			}
-
-			var productItemEntities = await _dbContext.ProductItems.ToListAsync();
-			foreach (var productItem in receipt.ProductItems)
-			{
-				var productItemEntity = productItemEntities.FirstOrDefault(pi => pi.Name == productItem.Name && pi.ProductID != null);
-
-				if (productItemEntity != null)
-				{
-					productItem.ProductID = productItemEntity.ProductID;
-					productItem.Product = null;
-				}
-			}
-
-			await _dbContext.Receipts.AddAsync(receipt);
-			await _dbContext.SaveChangesAsync();
-
-			var result = new ReceiptDto
-			{
-				FiscalDocumentNumber = receipt.FiscalDocumentNumber,
-				FiscalDriveNumber = receipt.FiscalDriveNumber,
-				FiscalType = receipt.FiscalType,
-				DateTime = receipt.DateTime,
-				OperationType = receipt.OperationType,
-				TotalSum = receipt.TotalSum
-			};
-
-			return Ok(result);
 		}
 
 		[HttpPost("barcode")]
 		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> CreateReceiptByBarcode(GenericDto<String> dto)
 		{
-			var barcodeString = dto.Value;
+			try
+			{
+				var barcodeString = dto.Value;
+
+				var result = await CreateReceipt(barcodeString);
+
+				return Ok(result);
+
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		private async Task<ReceiptDto> CreateReceipt(String barcodeString)
+		{
 			var qrcode = QRCode.Parse(barcodeString);
 
 			var receiptEntity = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == qrcode.FiscalDocumentNumber);
 			if (receiptEntity != null)
 			{
-				return BadRequest("Receipt already exists!");
+				throw new Exception("Receipt already exists!");
 			}
 
 			var receipt = await _fiscalDataService.GetReceipt(qrcode);
@@ -133,7 +118,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				TotalSum = receipt.TotalSum
 			};
 
-			return Ok(result);
+			return result;
 		}
 	}
 }
