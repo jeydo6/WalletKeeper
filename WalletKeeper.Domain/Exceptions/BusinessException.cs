@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace WalletKeeper.Domain.Exceptions
 {
+	/// <summary>
+	/// Ошибки бизнес-логики
+	/// </summary>
 	[Serializable]
 	public class BusinessException : Exception
 	{

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
+using WalletKeeper.Domain.Exceptions;
 
 namespace WalletKeeper.WebAPI.Controllers
 {
@@ -43,26 +44,26 @@ namespace WalletKeeper.WebAPI.Controllers
 		[Produces(typeof(String))]
 		public async Task<IActionResult> GetTokenAsync(LoginDto login)
 		{
-			if (String.IsNullOrEmpty(login.UserName))
+			if (String.IsNullOrWhiteSpace(login.UserName))
 			{
-				return BadRequest("UserName cannot be empty!");
+				throw new ArgumentOutOfRangeException(nameof(login), "UserName cannot be empty!");
 			}
 
 			if (String.IsNullOrEmpty(login.Password))
 			{
-				return BadRequest("Password cannot be empty!");
+				throw new ArgumentOutOfRangeException(nameof(login), "Password cannot be empty!");
 			}
 
 			var user = await _userManager.FindByNameAsync(login.UserName);
 			if (user == null || !await _userManager.CheckPasswordAsync(user, login.Password))
 			{
-				return BadRequest("Invalid username or password");
+				throw new BusinessException("Invalid username or password");
 			}
 
 			var identity = await _claimsPrincipalFactory.CreateAsync(user);
 			if (identity == null)
 			{
-				return BadRequest("Invalid username or password");
+				throw new BusinessException("Invalid username or password");
 			}
 
 			var key = new SymmetricSecurityKey(

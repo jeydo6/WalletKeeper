@@ -20,6 +20,7 @@ using WalletKeeper.Domain.Factories;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Infrastructure.Services;
 using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.WebAPI.ExceptionFilters;
 using WalletKeeper.WebAPI.Options;
 
 namespace WalletKeeper.WebAPI
@@ -40,7 +41,12 @@ namespace WalletKeeper.WebAPI
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services
-				.AddControllers()
+				.AddControllers(options =>
+				{
+					options.Filters.Add<ExceptionFilter>();
+					options.Filters.Add<BusinessExceptionFilter>();
+					options.Filters.Add<ArgumentExceptionFilter>();
+				})
 				.AddNewtonsoftJson();
 
 			services

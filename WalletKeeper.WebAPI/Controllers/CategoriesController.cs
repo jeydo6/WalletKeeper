@@ -49,138 +49,110 @@ namespace WalletKeeper.WebAPI.Controllers
 		[Produces(typeof(CategoryDto))]
 		public async Task<IActionResult> Get(Int32 id)
 		{
-			try
+			if (id <= 0)
 			{
-				if (id <= 0)
-				{
-					throw new ArgumentOutOfRangeException(nameof(id));
-				}
-
-				var category = await _dbContext.Categories.FindAsync(id);
-				if (category == null)
-				{
-					throw new BusinessException("Category is not exists!");
-				}
-
-				var result = new CategoryDto
-				{
-					ID = category.ID,
-					Name = category.Name
-				};
-
-				return Ok(result);
+				throw new ArgumentOutOfRangeException(nameof(id));
 			}
-			catch (BusinessException ex)
+
+			var category = await _dbContext.Categories.FindAsync(id);
+			if (category == null)
 			{
-				return BadRequest(ex.Message);
+				throw new BusinessException("Category is not exists!");
 			}
+
+			var result = new CategoryDto
+			{
+				ID = category.ID,
+				Name = category.Name
+			};
+
+			return Ok(result);
 		}
 
 		[HttpPost]
 		[Produces(typeof(CategoryDto))]
 		public async Task<IActionResult> Post(CategoryDto dto)
 		{
-			try
+			if (dto == null)
 			{
-				if (dto == null)
-				{
-					throw new ArgumentNullException(nameof(dto));
-				}
-
-				var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == dto.Name);
-				if (category != null)
-				{
-					throw new BusinessException("Category already exists!");
-				}
-
-				category = new Category
-				{
-					Name = dto.Name
-				};
-
-				await _dbContext.Categories.AddAsync(category);
-				await _dbContext.SaveChangesAsync();
-
-				var result = new CategoryDto
-				{
-					ID = category.ID,
-					Name = category.Name
-				};
-
-				return Ok(result);
+				throw new ArgumentNullException(nameof(dto));
 			}
-			catch (BusinessException ex)
+
+			var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == dto.Name);
+			if (category != null)
 			{
-				return BadRequest(ex.Message);
+				throw new BusinessException("Category already exists!");
 			}
+
+			category = new Category
+			{
+				Name = dto.Name
+			};
+
+			await _dbContext.Categories.AddAsync(category);
+			await _dbContext.SaveChangesAsync();
+
+			var result = new CategoryDto
+			{
+				ID = category.ID,
+				Name = category.Name
+			};
+
+			return Ok(result);
 		}
 
 		[HttpPut("{id}")]
 		[Produces(typeof(CategoryDto))]
 		public async Task<IActionResult> Put(Int32 id, CategoryDto dto)
 		{
-			try
+			if (id <= 0)
 			{
-				if (id <= 0)
-				{
-					throw new ArgumentOutOfRangeException(nameof(id));
-				}
-
-				if (dto == null)
-				{
-					throw new ArgumentNullException(nameof(dto));
-				}
-
-				var category = await _dbContext.Categories.FindAsync(id);
-				if (category == null)
-				{
-					throw new BusinessException("Category is not exists!");
-				}
-
-				category.Name = dto.Name;
-
-				await _dbContext.SaveChangesAsync();
-
-				var result = new CategoryDto
-				{
-					ID = category.ID,
-					Name = category.Name
-				};
-
-				return Ok(result);
+				throw new ArgumentOutOfRangeException(nameof(id));
 			}
-			catch (BusinessException ex)
+
+			if (dto == null)
 			{
-				return BadRequest(ex.Message);
+				throw new ArgumentNullException(nameof(dto));
 			}
+
+			var category = await _dbContext.Categories.FindAsync(id);
+			if (category == null)
+			{
+				throw new BusinessException("Category is not exists!");
+			}
+
+			category.Name = dto.Name;
+
+			await _dbContext.SaveChangesAsync();
+
+			var result = new CategoryDto
+			{
+				ID = category.ID,
+				Name = category.Name
+			};
+
+			return Ok(result);
 		}
 
 		[HttpDelete("{id}")]
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
 		public async Task<IActionResult> Delete(Int32 id)
 		{
-			try
+			if (id <= 0)
 			{
-				if (id <= 0)
-				{
-					throw new ArgumentOutOfRangeException(nameof(id));
-				}
-
-				var category = await _dbContext.Categories.FindAsync(id);
-				if (category == null)
-				{
-					throw new BusinessException("Category is not exists!");
-				}
-
-				_dbContext.Categories.Remove(category);
-				await _dbContext.SaveChangesAsync();
-
-				return NoContent();
+				throw new ArgumentOutOfRangeException(nameof(id));
 			}
-			catch (BusinessException ex)
+
+			var category = await _dbContext.Categories.FindAsync(id);
+			if (category == null)
 			{
-				return BadRequest(ex.Message);
+				throw new BusinessException("Category is not exists!");
 			}
+
+			_dbContext.Categories.Remove(category);
+			await _dbContext.SaveChangesAsync();
+
+			return NoContent();
 		}
 	}
 }

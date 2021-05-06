@@ -42,20 +42,17 @@ namespace WalletKeeper.WebAPI.Controllers
 		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> PostPhoto(GenericDto<Byte[]> dto)
 		{
-			try
+			var userIDString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (String.IsNullOrWhiteSpace(userIDString))
 			{
-				var userID = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
-				var barcodeString = _barcodeDecoder.Decode(dto.Value);
-
-				var result = await CreateReceipt(userID, barcodeString);
-
-				return Ok(result);
-
+				throw new BusinessException("User is unauthorized!");
 			}
-			catch (BusinessException ex)
-			{
-				return BadRequest(ex.Message);
-			}
+			var userID = new Guid(userIDString);
+			var barcodeString = _barcodeDecoder.Decode(dto.Value);
+
+			var result = await CreateReceipt(userID, barcodeString);
+
+			return Ok(result);
 		}
 
 		[HttpPost("barcode")]
@@ -64,7 +61,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			try
 			{
-				var userID = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
+				var userIDString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+				if (String.IsNullOrWhiteSpace(userIDString))
+				{
+					throw new BusinessException("User is unauthorized!");
+				}
+				var userID = new Guid(userIDString);
 				var barcodeString = dto.Value;
 
 				var result = await CreateReceipt(userID, barcodeString);
@@ -82,12 +84,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			if (userID == Guid.Empty)
 			{
-				throw new ArgumentNullException(nameof(userID));
+				throw new ArgumentOutOfRangeException(nameof(userID));
 			}
 
 			if (String.IsNullOrWhiteSpace(barcodeString))
 			{
-				throw new ArgumentNullException(nameof(barcodeString));
+				throw new ArgumentOutOfRangeException(nameof(barcodeString));
 			}
 
 			var qrcode = QRCode.Parse(barcodeString);
