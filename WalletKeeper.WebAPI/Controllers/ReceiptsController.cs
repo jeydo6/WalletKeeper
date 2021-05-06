@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Barcodes.Decoders;
@@ -43,9 +44,10 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			try
 			{
+				var userID = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
 				var barcodeString = _barcodeDecoder.Decode(dto.Value);
 
-				var result = await CreateReceipt(barcodeString);
+				var result = await CreateReceipt(userID, barcodeString);
 
 				return Ok(result);
 
@@ -62,9 +64,10 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			try
 			{
+				var userID = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
 				var barcodeString = dto.Value;
 
-				var result = await CreateReceipt(barcodeString);
+				var result = await CreateReceipt(userID, barcodeString);
 
 				return Ok(result);
 
@@ -75,8 +78,18 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 		}
 
-		private async Task<ReceiptDto> CreateReceipt(String barcodeString)
+		private async Task<ReceiptDto> CreateReceipt(Guid userID, String barcodeString)
 		{
+			if (userID == Guid.Empty)
+			{
+				throw new ArgumentNullException(nameof(userID));
+			}
+
+			if (String.IsNullOrWhiteSpace(barcodeString))
+			{
+				throw new ArgumentNullException(nameof(barcodeString));
+			}
+
 			var qrcode = QRCode.Parse(barcodeString);
 
 			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == qrcode.FiscalDocumentNumber);
@@ -86,6 +99,8 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 
 			receipt = await _fiscalDataService.GetReceipt(qrcode);
+			receipt.User = null;
+			receipt.UserID = userID;
 
 			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
 			if (organization != null)

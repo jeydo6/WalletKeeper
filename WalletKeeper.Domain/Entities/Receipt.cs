@@ -37,5 +37,9 @@ namespace WalletKeeper.Domain.Entities
 		public Organization Organization { get; set; }
 
 		public List<ProductItem> ProductItems { get; set; }
+
+		public Guid UserID { get; set; }
+
+		public User User { get; set; }
 	}
 }
