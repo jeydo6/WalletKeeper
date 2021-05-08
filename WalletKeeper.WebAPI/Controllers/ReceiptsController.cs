@@ -59,25 +59,17 @@ namespace WalletKeeper.WebAPI.Controllers
 		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> PostBarcode(GenericDto<String> dto)
 		{
-			try
+			var userIDString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (String.IsNullOrWhiteSpace(userIDString))
 			{
-				var userIDString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-				if (String.IsNullOrWhiteSpace(userIDString))
-				{
-					throw new BusinessException("User is unauthorized!");
-				}
-				var userID = new Guid(userIDString);
-				var barcodeString = dto.Value;
-
-				var result = await CreateReceipt(userID, barcodeString);
-
-				return Ok(result);
-
+				throw new BusinessException("User is unauthorized!");
 			}
-			catch (BusinessException ex)
-			{
-				return BadRequest(ex.Message);
-			}
+			var userID = new Guid(userIDString);
+			var barcodeString = dto.Value;
+
+			var result = await CreateReceipt(userID, barcodeString);
+
+			return Ok(result);
 		}
 
 		private async Task<ReceiptDto> CreateReceipt(Guid userID, String barcodeString)
