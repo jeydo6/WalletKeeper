@@ -126,6 +126,8 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 
 			product.Name = dto.Name;
+			product.CategoryID = dto.CategoryID;
+			product.Category = null;
 
 			await _dbContext.SaveChangesAsync();
 

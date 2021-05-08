@@ -93,8 +93,8 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 
 			receipt = await _fiscalDataService.GetReceipt(qrcode);
-			receipt.User = null;
 			receipt.UserID = userID;
+			receipt.User = null;
 
 			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN);
 			if (organization != null)
