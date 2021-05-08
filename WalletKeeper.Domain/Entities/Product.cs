@@ -18,7 +18,7 @@ namespace WalletKeeper.Domain.Entities
 
 		public String Name { get; set; }
 
-		public Int32 CategoryID { get; set; }
+		public Int32? CategoryID { get; set; }
 
 		public Category Category { get; set; }
 

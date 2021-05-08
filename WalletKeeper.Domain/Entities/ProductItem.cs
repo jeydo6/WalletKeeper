@@ -18,7 +18,7 @@ namespace WalletKeeper.Domain.Entities
 
 		public Decimal Sum { get; set; }
 
-		public Int32 ReceiptID { get; set; }
+		public Int32? ReceiptID { get; set; }
 
 		public Receipt Receipt { get; set; }
 
