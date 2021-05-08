@@ -84,12 +84,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			if (userID == Guid.Empty)
 			{
-				throw new ArgumentOutOfRangeException(nameof(userID));
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
 			if (String.IsNullOrWhiteSpace(barcodeString))
 			{
-				throw new ArgumentOutOfRangeException(nameof(barcodeString));
+				throw new ValidationException($"{nameof(barcodeString)} is invalid");
 			}
 
 			var qrcode = QRCode.Parse(barcodeString);

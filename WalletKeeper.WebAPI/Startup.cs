@@ -45,7 +45,7 @@ namespace WalletKeeper.WebAPI
 				{
 					options.Filters.Add<ExceptionFilter>();
 					options.Filters.Add<BusinessExceptionFilter>();
-					options.Filters.Add<ArgumentExceptionFilter>();
+					options.Filters.Add<ValidationExceptionFilter>();
 				})
 				.AddNewtonsoftJson();
 

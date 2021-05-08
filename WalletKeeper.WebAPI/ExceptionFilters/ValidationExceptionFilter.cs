@@ -2,20 +2,21 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using WalletKeeper.Application.Dto;
 
 namespace WalletKeeper.WebAPI.ExceptionFilters
 {
 	/// <summary>
-	/// Фильтр ошибок бизнес-логики - <see cref="ArgumentException"/>. Возвращает <see cref="ApiErrorDto"/>
+	/// Фильтр ошибок бизнес-логики - <see cref="ValidationException"/>. Возвращает <see cref="ApiErrorDto"/>
 	/// </summary>
-	public class ArgumentExceptionFilter : IExceptionFilter
+	public class ValidationExceptionFilter : IExceptionFilter
 	{
-		private readonly ILogger<ArgumentExceptionFilter> _logger;
+		private readonly ILogger<ValidationExceptionFilter> _logger;
 
-		public ArgumentExceptionFilter(
-			ILogger<ArgumentExceptionFilter> logger
+		public ValidationExceptionFilter(
+			ILogger<ValidationExceptionFilter> logger
 		)
 		{
 			_logger = logger;
@@ -23,17 +24,16 @@ namespace WalletKeeper.WebAPI.ExceptionFilters
 
 		public void OnException(ExceptionContext context)
 		{
-			if (context == null || context.Exception is not ArgumentException)
+			if (context == null || context.Exception is not ValidationException)
 			{
 				return;
 			}
 
-			var exception = context.Exception as ArgumentException;
+			var exception = context.Exception as ValidationException;
 			var message = exception.Message;
 			var code = $"{(Int32)HttpStatusCode.BadRequest}";
-			var reason = exception.ParamName;
 
-			var apiError = new ApiErrorDto(message, code: code, reason: reason);
+			var apiError = new ApiErrorDto(message, code: code);
 
 			context.Result = new BadRequestObjectResult(apiError);
 			context.ExceptionHandled = true;

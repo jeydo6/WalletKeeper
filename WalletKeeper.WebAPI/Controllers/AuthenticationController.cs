@@ -46,12 +46,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			if (String.IsNullOrWhiteSpace(login.UserName))
 			{
-				throw new ArgumentOutOfRangeException(nameof(login), "UserName cannot be empty!");
+				throw new ValidationException("UserName cannot be empty!");
 			}
 
 			if (String.IsNullOrEmpty(login.Password))
 			{
-				throw new ArgumentOutOfRangeException(nameof(login), "Password cannot be empty!");
+				throw new ValidationException("Password cannot be empty!");
 			}
 
 			var user = await _userManager.FindByNameAsync(login.UserName);

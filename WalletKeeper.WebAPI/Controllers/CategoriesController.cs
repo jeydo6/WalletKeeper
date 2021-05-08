@@ -51,7 +51,7 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			if (id <= 0)
 			{
-				throw new ArgumentOutOfRangeException(nameof(id));
+				throw new ValidationException($"{nameof(id)} is invalid");
 			}
 
 			var category = await _dbContext.Categories.FindAsync(id);
@@ -75,7 +75,7 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			if (dto == null)
 			{
-				throw new ArgumentNullException(nameof(dto));
+				throw new ValidationException($"{nameof(dto)} is invalid");
 			}
 
 			var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == dto.Name);
@@ -107,12 +107,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			if (id <= 0)
 			{
-				throw new ArgumentOutOfRangeException(nameof(id));
+				throw new ValidationException($"{nameof(id)} is invalid");
 			}
 
 			if (dto == null)
 			{
-				throw new ArgumentNullException(nameof(dto));
+				throw new ValidationException($"{nameof(dto)} is invalid");
 			}
 
 			var category = await _dbContext.Categories.FindAsync(id);
@@ -140,7 +140,7 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			if (id <= 0)
 			{
-				throw new ArgumentOutOfRangeException(nameof(id));
+				throw new ValidationException($"{nameof(id)} is invalid");
 			}
 
 			var category = await _dbContext.Categories.FindAsync(id);
