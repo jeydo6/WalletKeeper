@@ -15,7 +15,7 @@ namespace WalletKeeper.WebAPI.Controllers
 {
 	[Authorize]
 	[ApiController]
-	[Route("ProductItemItems")]
+	[Route("productItems")]
 	public class ProductItemsController : ControllerBase
 	{
 		private readonly ApplicationDbContext _dbContext;
