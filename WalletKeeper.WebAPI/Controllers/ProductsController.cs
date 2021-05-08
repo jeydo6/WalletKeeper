@@ -15,15 +15,15 @@ namespace WalletKeeper.WebAPI.Controllers
 {
 	[Authorize]
 	[ApiController]
-	[Route("categories")]
-	public class CategoriesController : ControllerBase
+	[Route("products")]
+	public class ProductsController : ControllerBase
 	{
 		private readonly ApplicationDbContext _dbContext;
-		private readonly ILogger<CategoriesController> _logger;
+		private readonly ILogger<ProductsController> _logger;
 
-		public CategoriesController(
+		public ProductsController(
 			ApplicationDbContext dbContext,
-			ILogger<CategoriesController> logger
+			ILogger<ProductsController> logger
 		)
 		{
 			_dbContext = dbContext;
@@ -31,54 +31,57 @@ namespace WalletKeeper.WebAPI.Controllers
 		}
 
 		[HttpGet]
-		[Produces(typeof(CategoryDto[]))]
+		[Produces(typeof(ProductDto[]))]
 		public async Task<IActionResult> List()
 		{
-			var categories = await _dbContext.Categories.ToListAsync();
+			var products = await _dbContext.Products.ToListAsync();
 
-			var result = categories.Select(c => new CategoryDto
+			var result = products.Select(p => new ProductDto
 			{
-				ID = c.ID,
-				Name = c.Name
+				ID = p.ID,
+				Name = p.Name,
+				CategoryID = p.CategoryID
 			}).ToArray();
 
 			return Ok(result);
 		}
 
 		[HttpPost]
-		[Produces(typeof(CategoryDto))]
-		public async Task<IActionResult> Post(CategoryDto dto)
+		[Produces(typeof(ProductDto))]
+		public async Task<IActionResult> Post(ProductDto dto)
 		{
 			if (dto == null)
 			{
 				throw new ValidationException($"{nameof(dto)} is invalid");
 			}
 
-			var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == dto.Name);
-			if (category != null)
+			var product = await _dbContext.Products.FirstOrDefaultAsync(c => c.Name == dto.Name);
+			if (product != null)
 			{
-				throw new BusinessException("Category already exists!");
+				throw new BusinessException("Product already exists!");
 			}
 
-			category = new Category
+			product = new Product
 			{
-				Name = dto.Name
+				Name = dto.Name,
+				CategoryID = dto.CategoryID
 			};
 
-			await _dbContext.Categories.AddAsync(category);
+			await _dbContext.Products.AddAsync(product);
 			await _dbContext.SaveChangesAsync();
 
-			var result = new CategoryDto
+			var result = new ProductDto
 			{
-				ID = category.ID,
-				Name = category.Name
+				ID = product.ID,
+				Name = product.Name,
+				CategoryID = product.CategoryID
 			};
 
 			return Ok(result);
 		}
 
 		[HttpGet("{id}")]
-		[Produces(typeof(CategoryDto))]
+		[Produces(typeof(ProductDto))]
 		public async Task<IActionResult> Get(Int32 id)
 		{
 			if (id <= 0)
@@ -86,24 +89,25 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(id)} is invalid");
 			}
 
-			var category = await _dbContext.Categories.FindAsync(id);
-			if (category == null)
+			var product = await _dbContext.Products.FindAsync(id);
+			if (product == null)
 			{
-				throw new BusinessException("Category is not exists!");
+				throw new BusinessException("Product is not exists!");
 			}
 
-			var result = new CategoryDto
+			var result = new ProductDto
 			{
-				ID = category.ID,
-				Name = category.Name
+				ID = product.ID,
+				Name = product.Name,
+				CategoryID = product.CategoryID
 			};
 
 			return Ok(result);
 		}
 
 		[HttpPut("{id}")]
-		[Produces(typeof(CategoryDto))]
-		public async Task<IActionResult> Put(Int32 id, CategoryDto dto)
+		[Produces(typeof(ProductDto))]
+		public async Task<IActionResult> Put(Int32 id, ProductDto dto)
 		{
 			if (id <= 0)
 			{
@@ -115,20 +119,21 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(dto)} is invalid");
 			}
 
-			var category = await _dbContext.Categories.FindAsync(id);
-			if (category == null)
+			var product = await _dbContext.Products.FindAsync(id);
+			if (product == null)
 			{
-				throw new BusinessException("Category is not exists!");
+				throw new BusinessException("Product is not exists!");
 			}
 
-			category.Name = dto.Name;
+			product.Name = dto.Name;
 
 			await _dbContext.SaveChangesAsync();
 
-			var result = new CategoryDto
+			var result = new ProductDto
 			{
-				ID = category.ID,
-				Name = category.Name
+				ID = product.ID,
+				Name = product.Name,
+				CategoryID = product.CategoryID
 			};
 
 			return Ok(result);
@@ -143,13 +148,13 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(id)} is invalid");
 			}
 
-			var category = await _dbContext.Categories.FindAsync(id);
-			if (category == null)
+			var product = await _dbContext.Products.FindAsync(id);
+			if (product == null)
 			{
-				throw new BusinessException("Category is not exists!");
+				throw new BusinessException("Product is not exists!");
 			}
 
-			_dbContext.Categories.Remove(category);
+			_dbContext.Products.Remove(product);
 			await _dbContext.SaveChangesAsync();
 
 			return NoContent();
