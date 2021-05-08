@@ -20,7 +20,7 @@ using WalletKeeper.Domain.Factories;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Infrastructure.Services;
 using WalletKeeper.Persistence.DbContexts;
-using WalletKeeper.WebAPI.ExceptionFilters;
+using WalletKeeper.WebAPI.Filters;
 using WalletKeeper.WebAPI.Options;
 
 namespace WalletKeeper.WebAPI

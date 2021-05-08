@@ -6,7 +6,7 @@ using System.Net;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Exceptions;
 
-namespace WalletKeeper.WebAPI.ExceptionFilters
+namespace WalletKeeper.WebAPI.Filters
 {
 	/// <summary>
 	/// Фильтр ошибок бизнес-логики - <see cref="BusinessException"/>. Возвращает <see cref="ApiErrorDto"/>
