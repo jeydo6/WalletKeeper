@@ -191,7 +191,7 @@ namespace WalletKeeper.WebAPI
 
 					options.User = new UserOptions
 					{
-						RequireUniqueEmail = true
+						RequireUniqueEmail = false
 					};
 
 					options.Lockout = new LockoutOptions
