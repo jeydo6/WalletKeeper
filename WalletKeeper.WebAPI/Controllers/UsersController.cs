@@ -50,13 +50,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(dto.Password)} is invalid");
 			}
 
-			var user = await _userManager.FindByNameAsync(dto.UserName);
-			if (user != null)
-			{
-				throw new BusinessException("User already exists!");
-			}
-
-			user = new User
+			var user = new User
 			{
 				UserName = dto.UserName,
 				Email = dto.Email,
@@ -69,7 +63,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				var fullError = String.Join(
 					", ",
 					identityResult.Errors
-						.Select(e => $"{e.Code} - {e.Description}")
+						.Select(e => $"[{e.Code}] {e.Description}")
 						.ToArray()
 				);
 
@@ -145,7 +139,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				var fullError = String.Join(
 					", ",
 					identityResult.Errors
-						.Select(e => $"{e.Code} - {e.Description}")
+						.Select(e => $"[{e.Code}] {e.Description}")
 						.ToArray()
 				);
 
@@ -162,6 +156,65 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 
 			return NoContent();
+		}
+
+		[HttpPatch("{id}/userName")]
+		[Produces(typeof(UserDto))]
+		public async Task<IActionResult> PatchUserName(String id, GenericDto<String> dto)
+		{
+			if (String.IsNullOrWhiteSpace(id))
+			{
+				throw new ValidationException($"{nameof(id)} is invalid");
+			}
+
+			if (dto == null)
+			{
+				throw new ValidationException($"{nameof(dto)} is invalid");
+			}
+
+			if (String.IsNullOrWhiteSpace(dto.Value))
+			{
+				throw new ValidationException($"{nameof(dto.Value)} is invalid");
+			}
+
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				throw new BusinessException("User is not exists!");
+			}
+
+			var identityResult = await _userManager.SetUserNameAsync(user, dto.Value);
+			if (!identityResult.Succeeded)
+			{
+				var fullError = String.Join(
+					", ",
+					identityResult.Errors
+						.Select(e => $"[{e.Code}] {e.Description}")
+						.ToArray()
+				);
+
+				_logger.LogDebug($"An error occurred while patching a user: {fullError}");
+
+				var shortError = String.Join(
+					", ",
+					identityResult.Errors
+						.Select(e => e.Description)
+						.ToArray()
+				);
+
+				throw new BusinessException(shortError);
+			}
+
+			var result = new UserDto
+			{
+				ID = user.Id,
+				UserName = user.UserName,
+				Password = user.PasswordHash,
+				Email = user.Email,
+				EmailConfirmed = user.EmailConfirmed
+			};
+
+			return Ok(result);
 		}
 	}
 }
