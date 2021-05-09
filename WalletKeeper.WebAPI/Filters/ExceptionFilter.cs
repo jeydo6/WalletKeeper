@@ -30,7 +30,7 @@ namespace WalletKeeper.WebAPI.Filters
 
 			var exception = context.Exception;
 			var message = exception.Message;
-			var code = $"{(Int32)HttpStatusCode.InternalServerError}";
+			var code = $"{HttpStatusCode.InternalServerError}";
 
 			var apiError = new ApiErrorDto(message, code: code);
 

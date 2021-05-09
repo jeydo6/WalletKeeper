@@ -31,7 +31,7 @@ namespace WalletKeeper.WebAPI.Filters
 
 			var exception = context.Exception as ValidationException;
 			var message = exception.Message;
-			var code = $"{(Int32)HttpStatusCode.BadRequest}";
+			var code = $"{HttpStatusCode.BadRequest}";
 
 			var apiError = new ApiErrorDto(message, code: code);
 
