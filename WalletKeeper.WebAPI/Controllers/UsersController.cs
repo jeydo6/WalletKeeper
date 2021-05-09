@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.WebAPI.Extensions;
 
 namespace WalletKeeper.WebAPI.Controllers
 {
@@ -58,26 +57,7 @@ namespace WalletKeeper.WebAPI.Controllers
 			};
 
 			var identityResult = await _userManager.CreateAsync(user, dto.Password);
-			if (!identityResult.Succeeded)
-			{
-				var fullError = String.Join(
-					", ",
-					identityResult.Errors
-						.Select(e => $"[{e.Code}] {e.Description}")
-						.ToArray()
-				);
-
-				_logger.LogDebug($"An error occurred while creating a user: {fullError}");
-
-				var shortError = String.Join(
-					", ",
-					identityResult.Errors
-						.Select(e => e.Description)
-						.ToArray()
-				);
-
-				throw new BusinessException(shortError);
-			}
+			identityResult.EnsureSuccess("An error occurred while creating a user", _logger);
 
 			var result = new UserDto
 			{
@@ -132,26 +112,7 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 
 			var identityResult = await _userManager.DeleteAsync(user);
-			if (!identityResult.Succeeded)
-			{
-				var fullError = String.Join(
-					", ",
-					identityResult.Errors
-						.Select(e => $"[{e.Code}] {e.Description}")
-						.ToArray()
-				);
-
-				_logger.LogDebug($"An error occurred while deleting a user: {fullError}");
-
-				var shortError = String.Join(
-					", ",
-					identityResult.Errors
-						.Select(e => e.Description)
-						.ToArray()
-				);
-
-				throw new BusinessException(shortError);
-			}
+			identityResult.EnsureSuccess("An error occurred while deleting a user", _logger);
 
 			return NoContent();
 		}
@@ -182,26 +143,7 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 
 			var identityResult = await _userManager.SetUserNameAsync(user, dto.UserName);
-			if (!identityResult.Succeeded)
-			{
-				var fullError = String.Join(
-					", ",
-					identityResult.Errors
-						.Select(e => $"[{e.Code}] {e.Description}")
-						.ToArray()
-				);
-
-				_logger.LogDebug($"An error occurred while patching a user: {fullError}");
-
-				var shortError = String.Join(
-					", ",
-					identityResult.Errors
-						.Select(e => e.Description)
-						.ToArray()
-				);
-
-				throw new BusinessException(shortError);
-			}
+			identityResult.EnsureSuccess("An error occurred while patching a user", _logger);
 
 			var result = new UserDto
 			{
@@ -245,26 +187,46 @@ namespace WalletKeeper.WebAPI.Controllers
 			}
 
 			var identityResult = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
-			if (!identityResult.Succeeded)
+			identityResult.EnsureSuccess("An error occurred while patching a user", _logger);
+
+			var result = new UserDto
 			{
-				var fullError = String.Join(
-					", ",
-					identityResult.Errors
-						.Select(e => $"[{e.Code}] {e.Description}")
-						.ToArray()
-				);
+				ID = user.Id,
+				UserName = user.UserName,
+				Email = user.Email,
+				EmailConfirmed = user.EmailConfirmed
+			};
 
-				_logger.LogDebug($"An error occurred while patching a user: {fullError}");
+			return Ok(result);
+		}
 
-				var shortError = String.Join(
-					", ",
-					identityResult.Errors
-						.Select(e => e.Description)
-						.ToArray()
-				);
-
-				throw new BusinessException(shortError);
+		[HttpPatch("{id}/email")]
+		[Produces(typeof(UserDto))]
+		public async Task<IActionResult> PatchEmail(String id, ChangeUserEmail dto)
+		{
+			if (String.IsNullOrWhiteSpace(id))
+			{
+				throw new ValidationException($"{nameof(id)} is invalid");
 			}
+
+			if (dto == null)
+			{
+				throw new ValidationException($"{nameof(dto)} is invalid");
+			}
+
+			if (String.IsNullOrWhiteSpace(dto.Email))
+			{
+				throw new ValidationException($"{nameof(dto.Email)} is invalid");
+			}
+
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				throw new BusinessException("User is not exists!");
+			}
+
+			var identityResult = await _userManager.SetEmailAsync(user, dto.Email);
+			identityResult.EnsureSuccess("An error occurred while patching a user", _logger);
 
 			var result = new UserDto
 			{
