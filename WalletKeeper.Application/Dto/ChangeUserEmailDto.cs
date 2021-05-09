@@ -2,7 +2,7 @@
 
 namespace WalletKeeper.Application.Dto
 {
-	public class ChangeUserEmail
+	public class ChangeUserEmailDto
 	{
 		public String Email { get; set; }
 	}

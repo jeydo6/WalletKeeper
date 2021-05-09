@@ -202,7 +202,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 		[HttpPatch("{id}/email")]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> PatchEmail(String id, ChangeUserEmail dto)
+		public async Task<IActionResult> PatchEmail(String id, ChangeUserEmailDto dto)
 		{
 			if (String.IsNullOrWhiteSpace(id))
 			{
