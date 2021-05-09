@@ -26,8 +26,8 @@ namespace WalletKeeper.WebAPI.Controllers
 			ILogger<CategoriesController> logger
 		)
 		{
-			_dbContext = dbContext;
-			_logger = logger;
+			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		[HttpGet]

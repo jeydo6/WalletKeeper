@@ -33,10 +33,10 @@ namespace WalletKeeper.WebAPI.Controllers
 			ILogger<AuthenticationController> logger
 		)
 		{
-			_userManager = userManager;
-			_authenticationConfig = authenticationConfigOptions.Value;
-			_claimsPrincipalFactory = claimsPrincipalFactory;
-			_logger = logger;
+			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+			_authenticationConfig = authenticationConfigOptions != null ? authenticationConfigOptions.Value : throw new ArgumentNullException(nameof(authenticationConfigOptions));
+			_claimsPrincipalFactory = claimsPrincipalFactory ?? throw new ArgumentNullException(nameof(claimsPrincipalFactory));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		[AllowAnonymous]

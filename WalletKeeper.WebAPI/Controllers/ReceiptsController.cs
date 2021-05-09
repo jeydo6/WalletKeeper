@@ -32,10 +32,10 @@ namespace WalletKeeper.WebAPI.Controllers
 			ILogger<ReceiptsController> logger
 		)
 		{
-			_dbContext = dbContext;
-			_barcodeDecoder = barcodeDecoder;
-			_fiscalDataService = fiscalDataService;
-			_logger = logger;
+			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_barcodeDecoder = barcodeDecoder ?? throw new ArgumentNullException(nameof(barcodeDecoder));
+			_fiscalDataService = fiscalDataService ?? throw new ArgumentNullException(nameof(fiscalDataService));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		[HttpPost("photo")]
