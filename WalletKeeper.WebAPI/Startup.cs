@@ -177,7 +177,7 @@ namespace WalletKeeper.WebAPI
 				{
 					options.SignIn = new SignInOptions
 					{
-						RequireConfirmedEmail = false
+						RequireConfirmedEmail = true
 					};
 
 					options.Password = new PasswordOptions
@@ -191,7 +191,7 @@ namespace WalletKeeper.WebAPI
 
 					options.User = new UserOptions
 					{
-						RequireUniqueEmail = false
+						RequireUniqueEmail = true
 					};
 
 					options.Lockout = new LockoutOptions

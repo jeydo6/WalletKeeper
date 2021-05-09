@@ -117,9 +117,9 @@ namespace WalletKeeper.WebAPI.Controllers
 			return NoContent();
 		}
 
-		[HttpPatch("{id}/userName")]
+		[HttpPatch("{id}/change/userName")]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> PatchUserName(String id, ChangeUserNameDto dto)
+		public async Task<IActionResult> ChangeUserName(String id, ChangeUserNameDto dto)
 		{
 			if (String.IsNullOrWhiteSpace(id))
 			{
@@ -156,9 +156,9 @@ namespace WalletKeeper.WebAPI.Controllers
 			return Ok(result);
 		}
 
-		[HttpPatch("{id}/password")]
+		[HttpPatch("{id}/change/password")]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> PatchPassword(String id, ChangeUserPasswordDto dto)
+		public async Task<IActionResult> ChangePassword(String id, ChangeUserPasswordDto dto)
 		{
 			if (String.IsNullOrWhiteSpace(id))
 			{
@@ -200,9 +200,9 @@ namespace WalletKeeper.WebAPI.Controllers
 			return Ok(result);
 		}
 
-		[HttpPatch("{id}/email")]
-		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> PatchEmail(String id, ChangeUserEmailDto dto)
+		[HttpGet("{id}/change/email")]
+		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
+		public async Task<IActionResult> ChangeEmail(String id, ChangeUserEmailDto dto)
 		{
 			if (String.IsNullOrWhiteSpace(id))
 			{
@@ -225,7 +225,42 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new BusinessException("User is not exists!");
 			}
 
-			var identityResult = await _userManager.SetEmailAsync(user, dto.Email);
+			var token = await _userManager.GenerateChangeEmailTokenAsync(user, dto.Email);
+
+			return NoContent();
+		}
+
+		[HttpPatch("{id}/change/email")]
+		[Produces(typeof(UserDto))]
+		public async Task<IActionResult> ChangeEmail(String id, String token, ChangeUserEmailDto dto)
+		{
+			if (String.IsNullOrWhiteSpace(id))
+			{
+				throw new ValidationException($"{nameof(id)} is invalid");
+			}
+
+			if (dto == null)
+			{
+				throw new ValidationException($"{nameof(dto)} is invalid");
+			}
+
+			if (String.IsNullOrWhiteSpace(dto.Email))
+			{
+				throw new ValidationException($"{nameof(dto.Email)} is invalid");
+			}
+
+			if (String.IsNullOrWhiteSpace(token))
+			{
+				throw new ValidationException($"{nameof(token)} is invalid");
+			}
+
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				throw new BusinessException("User is not exists!");
+			}
+
+			var identityResult = await _userManager.ChangeEmailAsync(user, dto.Email, token);
 			identityResult.EnsureSuccess("An error occurred while patching a user", _logger);
 
 			var result = new UserDto
@@ -238,5 +273,114 @@ namespace WalletKeeper.WebAPI.Controllers
 
 			return Ok(result);
 		}
+
+		[HttpGet("{id}/confirm/email")]
+		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
+		public async Task<IActionResult> ConfirmEmail(String id)
+		{
+			if (String.IsNullOrWhiteSpace(id))
+			{
+				throw new ValidationException($"{nameof(id)} is invalid");
+			}
+
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				throw new BusinessException("User is not exists!");
+			}
+
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+			return NoContent();
+		}
+
+		[HttpPatch("{id}/confirm/email")]
+		[Produces(typeof(UserDto))]
+		public async Task<IActionResult> ConfirmEmail(String id, String token)
+		{
+			if (String.IsNullOrWhiteSpace(id))
+			{
+				throw new ValidationException($"{nameof(id)} is invalid");
+			}
+
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				throw new BusinessException("User is not exists!");
+			}
+
+			var identityResult = await _userManager.ConfirmEmailAsync(user, token);
+			identityResult.EnsureSuccess("An error occurred while patching a user", _logger);
+
+			var result = new UserDto
+			{
+				ID = user.Id,
+				UserName = user.UserName,
+				Email = user.Email,
+				EmailConfirmed = user.EmailConfirmed
+			};
+
+			return Ok(result);
+		}
+
+		[HttpGet("{id}/reset/password")]
+		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
+		public async Task<IActionResult> ResetPassword(String id)
+		{
+			if (String.IsNullOrWhiteSpace(id))
+			{
+				throw new ValidationException($"{nameof(id)} is invalid");
+			}
+
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				throw new BusinessException("User is not exists!");
+			}
+
+			var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+			return NoContent();
+		}
+
+		[HttpPatch("{id}/reset/password")]
+		[Produces(typeof(UserDto))]
+		public async Task<IActionResult> ResetPassword(String id, String token, ResetUserPasswordDto dto)
+		{
+			if (String.IsNullOrWhiteSpace(id))
+			{
+				throw new ValidationException($"{nameof(id)} is invalid");
+			}
+
+			if (dto == null)
+			{
+				throw new ValidationException($"{nameof(dto)} is invalid");
+			}
+
+			if (String.IsNullOrWhiteSpace(dto.Password))
+			{
+				throw new ValidationException($"{nameof(dto.Password)} is invalid");
+			}
+
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+			{
+				throw new BusinessException("User is not exists!");
+			}
+
+			var identityResult = await _userManager.ResetPasswordAsync(user, token, dto.Password);
+			identityResult.EnsureSuccess("An error occurred while patching a user", _logger);
+
+			var result = new UserDto
+			{
+				ID = user.Id,
+				UserName = user.UserName,
+				Email = user.Email,
+				EmailConfirmed = user.EmailConfirmed
+			};
+
+			return Ok(result);
+		}
+
 	}
 }

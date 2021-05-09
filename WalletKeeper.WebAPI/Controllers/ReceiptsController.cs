@@ -40,7 +40,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 		[HttpPost("photo")]
 		[Produces(typeof(ReceiptDto))]
-		public async Task<IActionResult> PostPhoto(GenericDto<Byte[]> dto)
+		public async Task<IActionResult> Post(GenericDto<Byte[]> dto)
 		{
 			var userIDString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (String.IsNullOrWhiteSpace(userIDString))
@@ -57,7 +57,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 		[HttpPost("barcode")]
 		[Produces(typeof(ReceiptDto))]
-		public async Task<IActionResult> PostBarcode(GenericDto<String> dto)
+		public async Task<IActionResult> Post(GenericDto<String> dto)
 		{
 			var userIDString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			if (String.IsNullOrWhiteSpace(userIDString))
