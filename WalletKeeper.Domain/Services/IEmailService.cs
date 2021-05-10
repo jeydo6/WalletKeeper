@@ -5,6 +5,6 @@ namespace WalletKeeper.Domain.Services
 {
 	public interface IEmailService
 	{
-		Task Send(EmailMessage message);
+		Task SendAsync(EmailMessage message);
 	}
 }

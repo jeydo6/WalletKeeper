@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Net;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Exceptions;
@@ -38,7 +37,7 @@ namespace WalletKeeper.WebAPI.Filters
 			context.Result = new BadRequestObjectResult(apiError);
 			context.ExceptionHandled = true;
 
-			_logger.LogError($"Ошибка обработки запроса: {exception}");
+			_logger.LogError(exception, "An error occurred in business process");
 		}
 	}
 }

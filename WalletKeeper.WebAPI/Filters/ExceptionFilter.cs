@@ -40,7 +40,7 @@ namespace WalletKeeper.WebAPI.Filters
 			};
 			context.ExceptionHandled = true;
 
-			_logger.LogError($"Ошибка обработки запроса: {exception}");
+			_logger.LogError(exception, "An error occurred");
 		}
 	}
 }

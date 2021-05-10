@@ -12,12 +12,12 @@ namespace WalletKeeper.Domain.Types
 			Body = body;
 		}
 
-		public EmailAddress From { get; private set; }
+		public EmailAddress From { get; }
 
-		public EmailAddress To { get; private set; }
+		public EmailAddress To { get; }
 
-		public String Subject { get; private set; }
+		public String Subject { get; }
 
-		public String Body { get; private set; }
+		public String Body { get; }
 	}
 }

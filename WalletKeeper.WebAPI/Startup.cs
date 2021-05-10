@@ -53,18 +53,13 @@ namespace WalletKeeper.WebAPI
 				.AddOptions();
 
 			services
-				.Configure<AuthenticationConfig>(
-					Configuration.GetSection($"{nameof(AuthenticationConfig)}")
-				)
-				.Configure<FiscalDataServiceConfig>(
-					Configuration.GetSection($"{nameof(FiscalDataServiceConfig)}")
-				);
+				.Configure<AuthenticationConfig>(Configuration.GetSection($"{nameof(AuthenticationConfig)}"))
+				.Configure<FiscalDataServiceConfig>(Configuration.GetSection($"{nameof(FiscalDataServiceConfig)}"))
+				.Configure<SmtpConfig>(Configuration.GetSection($"{nameof(SmtpConfig)}"));
 
 			services
 				.AddDbContext<ApplicationDbContext>(options =>
-					options.UseSqlServer(
-						Configuration.GetConnectionString("DbConnection")
-					)
+					options.UseSqlServer(Configuration.GetConnectionString("DbConnection"))
 				);
 
 			services

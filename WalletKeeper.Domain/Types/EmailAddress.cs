@@ -4,8 +4,14 @@ namespace WalletKeeper.Domain.Types
 {
 	public class EmailAddress
 	{
-		public String Name { get; set; }
+		public EmailAddress(String address, String name = null)
+		{
+			Address = address;
+			Name = name;
+		}
 
-		public String Address { get; set; }
+		public String Name { get; }
+
+		public String Address { get; }
 	}
 }
