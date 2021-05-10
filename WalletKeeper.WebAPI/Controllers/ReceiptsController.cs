@@ -8,9 +8,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Barcodes.Decoders;
-using WalletKeeper.Barcodes.Types;
 using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Services;
+using WalletKeeper.Domain.Types;
 using WalletKeeper.Persistence.DbContexts;
 
 namespace WalletKeeper.WebAPI.Controllers

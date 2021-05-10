@@ -1,6 +1,5 @@
 ﻿using ImageMagick;
 using System;
-using WalletKeeper.Barcodes.Enumerations;
 using WalletKeeper.Barcodes.Readers;
 using ZXing;
 

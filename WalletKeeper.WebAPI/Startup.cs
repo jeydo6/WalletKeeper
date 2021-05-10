@@ -77,7 +77,8 @@ namespace WalletKeeper.WebAPI
 				});
 
 			services
-				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>();
+				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>()
+				.AddSingleton<IEmailService, EmailService>();
 
 			services
 				.AddSwaggerGen(options =>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WalletKeeper.Barcodes.Types
+namespace WalletKeeper.Domain.Types
 {
 	public class UPCode
 	{
