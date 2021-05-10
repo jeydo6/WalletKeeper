@@ -12,10 +12,13 @@ namespace WalletKeeper.Domain.Entities
 
 		public String Name { get; set; }
 
+		[Column(TypeName = "decimal(18, 2)")]
 		public Decimal Price { get; set; }
 
+		[Column(TypeName = "decimal(18, 4)")]
 		public Decimal Quantity { get; set; }
 
+		[Column(TypeName = "decimal(18, 2)")]
 		public Decimal Sum { get; set; }
 
 		public Int32? ReceiptID { get; set; }

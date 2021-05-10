@@ -26,6 +26,7 @@ namespace WalletKeeper.Domain.Entities
 
 		public DateTime DateTime { get; set; }
 
+		[Column(TypeName = "decimal(18, 2)")]
 		public Decimal TotalSum { get; set; }
 
 		public Int32 OperationType { get; set; }
