@@ -1,3 +1,5 @@
+[![.NET](https://github.com/jeydo6/WalletKeeper.WebAPI/actions/workflows/dotnet.yml/badge.svg)](https://github.com/jeydo6/WalletKeeper.WebAPI/actions/workflows/dotnet.yml)
+
 # WalletKeeper.WebAPI
 
 One day I decided to start counting my money spending at the supermarket. Here is the result.
