@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Entities;
@@ -70,16 +71,18 @@ namespace WalletKeeper.WebAPI.Controllers
 			return Ok(result);
 		}
 
-		[HttpGet("{id}")]
+		[HttpGet]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> Get(String id)
+		public async Task<IActionResult> Get()
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -96,16 +99,18 @@ namespace WalletKeeper.WebAPI.Controllers
 			return Ok(result);
 		}
 
-		[HttpDelete("{id}")]
+		[HttpDelete]
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> Delete(String id)
+		public async Task<IActionResult> Delete()
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -117,13 +122,15 @@ namespace WalletKeeper.WebAPI.Controllers
 			return NoContent();
 		}
 
-		[HttpPatch("{id}/change/userName")]
+		[HttpPatch("change/userName")]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> ChangeUserName(String id, ChangeUserNameDto dto)
+		public async Task<IActionResult> ChangeUserName(ChangeUserNameDto dto)
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
 			if (dto == null)
@@ -136,7 +143,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(dto.UserName)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -156,13 +163,15 @@ namespace WalletKeeper.WebAPI.Controllers
 			return Ok(result);
 		}
 
-		[HttpPatch("{id}/change/password")]
+		[HttpPatch("change/password")]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> ChangePassword(String id, ChangeUserPasswordDto dto)
+		public async Task<IActionResult> ChangePassword(ChangeUserPasswordDto dto)
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
 			if (dto == null)
@@ -180,7 +189,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(dto.NewPassword)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -200,13 +209,15 @@ namespace WalletKeeper.WebAPI.Controllers
 			return Ok(result);
 		}
 
-		[HttpGet("{id}/change/email")]
+		[HttpGet("change/email")]
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> ChangeEmail(String id, ChangeUserEmailDto dto)
+		public async Task<IActionResult> ChangeEmail(ChangeUserEmailDto dto)
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
 			if (dto == null)
@@ -219,7 +230,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(dto.Email)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -230,13 +241,15 @@ namespace WalletKeeper.WebAPI.Controllers
 			return NoContent();
 		}
 
-		[HttpPatch("{id}/change/email")]
+		[HttpPatch("change/email")]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> ChangeEmail(String id, String token, ChangeUserEmailDto dto)
+		public async Task<IActionResult> ChangeEmail(String token, ChangeUserEmailDto dto)
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
 			if (dto == null)
@@ -254,7 +267,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(token)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -274,16 +287,18 @@ namespace WalletKeeper.WebAPI.Controllers
 			return Ok(result);
 		}
 
-		[HttpGet("{id}/confirm/email")]
+		[HttpGet("confirm/email")]
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> ConfirmEmail(String id)
+		public async Task<IActionResult> ConfirmEmail()
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -294,16 +309,18 @@ namespace WalletKeeper.WebAPI.Controllers
 			return NoContent();
 		}
 
-		[HttpPatch("{id}/confirm/email")]
+		[HttpPatch("confirm/email")]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> ConfirmEmail(String id, String token)
+		public async Task<IActionResult> ConfirmEmail(String token)
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -323,16 +340,18 @@ namespace WalletKeeper.WebAPI.Controllers
 			return Ok(result);
 		}
 
-		[HttpGet("{id}/reset/password")]
+		[HttpGet("reset/password")]
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> ResetPassword(String id)
+		public async Task<IActionResult> ResetPassword()
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
@@ -343,13 +362,15 @@ namespace WalletKeeper.WebAPI.Controllers
 			return NoContent();
 		}
 
-		[HttpPatch("{id}/reset/password")]
+		[HttpPatch("reset/password")]
 		[Produces(typeof(UserDto))]
-		public async Task<IActionResult> ResetPassword(String id, String token, ResetUserPasswordDto dto)
+		public async Task<IActionResult> ResetPassword(String token, ResetUserPasswordDto dto)
 		{
-			if (String.IsNullOrWhiteSpace(id))
+			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (String.IsNullOrWhiteSpace(userID))
 			{
-				throw new ValidationException($"{nameof(id)} is invalid");
+				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
 			if (dto == null)
@@ -362,7 +383,7 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(dto.Password)} is invalid");
 			}
 
-			var user = await _userManager.FindByIdAsync(id);
+			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");
