@@ -67,7 +67,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 			if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userID))
 			{
-				throw new BusinessException("userID is invalid");
+				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
 			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == id && pi.Receipt.UserID == userID);
@@ -106,7 +106,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 			if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userID))
 			{
-				throw new BusinessException("userID is invalid");
+				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
 			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == id && pi.Receipt.UserID == userID);
@@ -146,7 +146,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 			if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userID))
 			{
-				throw new BusinessException("userID is invalid");
+				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
 			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == id && pi.Receipt.UserID == userID);

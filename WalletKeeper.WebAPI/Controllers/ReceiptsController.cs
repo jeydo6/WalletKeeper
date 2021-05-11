@@ -42,12 +42,11 @@ namespace WalletKeeper.WebAPI.Controllers
 		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> Post(GenericDto<Byte[]> dto)
 		{
-			var userIDString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (String.IsNullOrWhiteSpace(userIDString))
+			if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userID))
 			{
-				throw new BusinessException("User is unauthorized!");
+				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
-			var userID = new Guid(userIDString);
+
 			var barcodeString = _barcodeDecoder.Decode(dto.Value);
 
 			var result = await CreateReceipt(userID, barcodeString);
@@ -59,12 +58,10 @@ namespace WalletKeeper.WebAPI.Controllers
 		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> Post(GenericDto<String> dto)
 		{
-			var userIDString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (String.IsNullOrWhiteSpace(userIDString))
+			if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userID))
 			{
-				throw new BusinessException("User is unauthorized!");
+				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
-			var userID = new Guid(userIDString);
 			var barcodeString = dto.Value;
 
 			var result = await CreateReceipt(userID, barcodeString);
