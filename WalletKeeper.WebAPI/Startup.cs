@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -63,22 +64,6 @@ namespace WalletKeeper.WebAPI
 				);
 
 			services
-				.AddSingleton<EmailMessageFactory>();
-
-			services
-				.AddHttpClient<IFiscalDataService, FiscalDataService>((sp, httpClient) =>
-				{
-					var configOptions = sp.GetRequiredService<IOptions<FiscalDataServiceConfig>>();
-					var config = configOptions.Value;
-
-					httpClient.BaseAddress = new Uri(config.Address);
-				});
-
-			services
-				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>()
-				.AddSingleton<IEmailService, EmailService>();
-
-			services
 				.AddSwaggerGen(options =>
 				{
 					options.SwaggerDoc("main", new OpenApiInfo
@@ -118,6 +103,25 @@ namespace WalletKeeper.WebAPI
 						}
 					});
 				});
+
+			services
+				.AddMediatR(typeof(Application.AssemblyMarker));
+
+			services
+				.AddSingleton<EmailMessageFactory>();
+
+			services
+				.AddHttpClient<IFiscalDataService, FiscalDataService>((sp, httpClient) =>
+				{
+					var configOptions = sp.GetRequiredService<IOptions<FiscalDataServiceConfig>>();
+					var config = configOptions.Value;
+
+					httpClient.BaseAddress = new Uri(config.Address);
+				});
+
+			services
+				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>()
+				.AddSingleton<IEmailService, EmailService>();
 
 			services
 				.AddAuthentication(options =>
