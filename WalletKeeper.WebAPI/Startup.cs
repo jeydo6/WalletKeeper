@@ -63,6 +63,9 @@ namespace WalletKeeper.WebAPI
 				);
 
 			services
+				.AddSingleton<EmailMessageFactory>();
+
+			services
 				.AddHttpClient<IFiscalDataService, FiscalDataService>((sp, httpClient) =>
 				{
 					var configOptions = sp.GetRequiredService<IOptions<FiscalDataServiceConfig>>();
@@ -173,7 +176,7 @@ namespace WalletKeeper.WebAPI
 				{
 					options.SignIn = new SignInOptions
 					{
-						RequireConfirmedEmail = true
+						RequireConfirmedEmail = false
 					};
 
 					options.Password = new PasswordOptions

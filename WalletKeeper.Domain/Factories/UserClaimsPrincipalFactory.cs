@@ -10,8 +10,8 @@ namespace WalletKeeper.Domain.Factories
 	{
 		public UserClaimsPrincipalFactory(
 			UserManager<User> userManager,
-			IOptions<IdentityOptions> optionsAccessor)
-			: base(userManager, optionsAccessor)
+			IOptions<IdentityOptions> optionsAccessor
+		) : base(userManager, optionsAccessor)
 		{
 			//
 		}

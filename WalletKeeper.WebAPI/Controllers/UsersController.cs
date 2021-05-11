@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.Domain.Factories;
+using WalletKeeper.Domain.Services;
+using WalletKeeper.Domain.Types;
 using WalletKeeper.WebAPI.Extensions;
 
 namespace WalletKeeper.WebAPI.Controllers
@@ -19,14 +22,21 @@ namespace WalletKeeper.WebAPI.Controllers
 	public class UsersController : ControllerBase
 	{
 		private readonly UserManager<User> _userManager;
+		private readonly EmailMessageFactory _emailMessageFactory;
+		
+		private readonly IEmailService _emailService;
 		private readonly ILogger<UsersController> _logger;
 
 		public UsersController(
 			UserManager<User> userManager,
+			EmailMessageFactory emailMessageFactory,
+			IEmailService emailService,
 			ILogger<UsersController> logger
 		)
 		{
 			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+			_emailMessageFactory = emailMessageFactory ?? throw new ArgumentNullException(nameof(emailMessageFactory));
+			_emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -211,7 +221,7 @@ namespace WalletKeeper.WebAPI.Controllers
 
 		[HttpGet("change/email")]
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> ChangeEmail(ChangeUserEmailDto dto)
+		public async Task<IActionResult> ChangeEmail(String newEmail)
 		{
 			var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -220,14 +230,9 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new ValidationException($"{nameof(userID)} is invalid");
 			}
 
-			if (dto == null)
+			if (String.IsNullOrWhiteSpace(newEmail))
 			{
-				throw new ValidationException($"{nameof(dto)} is invalid");
-			}
-
-			if (String.IsNullOrWhiteSpace(dto.Email))
-			{
-				throw new ValidationException($"{nameof(dto.Email)} is invalid");
+				throw new ValidationException($"{nameof(newEmail)} is invalid");
 			}
 
 			var user = await _userManager.FindByIdAsync(userID);
@@ -236,7 +241,12 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new BusinessException("User is not exists!");
 			}
 
-			var token = await _userManager.GenerateChangeEmailTokenAsync(user, dto.Email);
+			var to = new EmailAddress(user.Email, user.UserName);
+			var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+
+			var emailMessage = _emailMessageFactory.CreateEmailChangingMessage(to, token);
+
+			await _emailService.SendAsync(emailMessage);
 
 			return NoContent();
 		}
@@ -304,7 +314,12 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new BusinessException("User is not exists!");
 			}
 
+			var to = new EmailAddress(user.Email, user.UserName);
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+			var emailMessage = _emailMessageFactory.CreateEmailConfirmationMessage(to, token);
+
+			await _emailService.SendAsync(emailMessage);
 
 			return NoContent();
 		}
@@ -357,7 +372,12 @@ namespace WalletKeeper.WebAPI.Controllers
 				throw new BusinessException("User is not exists!");
 			}
 
+			var to = new EmailAddress(user.Email, user.UserName);
 			var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+			var emailMessage = _emailMessageFactory.CreatePasswordResettingMessage(to, token);
+
+			await _emailService.SendAsync(emailMessage);
 
 			return NoContent();
 		}

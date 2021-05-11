@@ -26,20 +26,20 @@ namespace WalletKeeper.Infrastructure.Services
 			_logger = logger;
 		}
 
-		public async Task SendAsync(EmailMessage message)
+		public async Task SendAsync(EmailMessage emailMessage)
 		{
 			var mimeFrom = new MailboxAddress[]
 			{
-				new MailboxAddress(_config.EmailAddress, _config.EmailName)
+				new MailboxAddress(_config.EmailName, _config.EmailAddress)
 			};
 			var mimeTo = new MailboxAddress[]
 			{
-				new MailboxAddress(message.To.Name, message.To.Address)
+				new MailboxAddress(emailMessage.To.Name, emailMessage.To.Address)
 			};
-			var mimeSubject = message.Subject;
+			var mimeSubject = emailMessage.Subject;
 			var mimeBody = new TextPart(TextFormat.Html)
 			{
-				Text = message.Body
+				Text = emailMessage.Body
 			};
 
 			var mimeMessage = new MimeMessage(mimeFrom, mimeTo, mimeSubject, mimeBody);
