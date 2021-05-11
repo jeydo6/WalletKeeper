@@ -1,6 +1,6 @@
 # WalletKeeper.WebAPI
 
-One day I decided to start counting my expenses at the supermarket. Here is the result.
+One day I decided to start counting my money spending at the supermarket. Here is the result.
 
 After the purchase, I scan the QR code on the receipt and save the resulting shopping list in the database.
 
