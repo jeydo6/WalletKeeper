@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using System;
 using System.Threading.Tasks;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Services;
@@ -31,7 +30,7 @@ namespace WalletKeeper.Infrastructure.Services
 		{
 			var mimeFrom = new MailboxAddress[]
 			{
-				new MailboxAddress(message.From.Name, message.From.Address)
+				new MailboxAddress(_config.EmailAddress, _config.EmailName)
 			};
 			var mimeTo = new MailboxAddress[]
 			{
