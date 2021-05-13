@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using WalletKeeper.Application.Commands;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Domain.Entities;
-using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Application.Queries;
 
 namespace WalletKeeper.WebAPI.Controllers
 {
@@ -18,139 +15,56 @@ namespace WalletKeeper.WebAPI.Controllers
 	[Route("categories")]
 	public class CategoriesController : ControllerBase
 	{
-		private readonly ApplicationDbContext _dbContext;
-		private readonly ILogger<CategoriesController> _logger;
+		private readonly IMediator _mediator;
 
 		public CategoriesController(
-			ApplicationDbContext dbContext,
-			ILogger<CategoriesController> logger
+			IMediator mediator
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			_mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 		}
 
 		[HttpGet]
 		[Produces(typeof(CategoryDto[]))]
 		public async Task<IActionResult> List()
 		{
-			var categories = await _dbContext.Categories.ToListAsync();
-
-			var result = categories.Select(c => new CategoryDto
-			{
-				ID = c.ID,
-				Name = c.Name
-			}).ToArray();
-
-			return Ok(result);
+			return Ok(
+				await _mediator.Send(new GetCategoriesQuery())
+			);
 		}
 
 		[HttpPost]
 		[Produces(typeof(CategoryDto))]
 		public async Task<IActionResult> Post(CategoryDto dto)
 		{
-			if (dto == null)
-			{
-				throw new ValidationException($"{nameof(dto)} is invalid");
-			}
-
-			var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == dto.Name);
-			if (category != null)
-			{
-				throw new BusinessException("Category already exists!");
-			}
-
-			category = new Category
-			{
-				Name = dto.Name
-			};
-
-			await _dbContext.Categories.AddAsync(category);
-			await _dbContext.SaveChangesAsync();
-
-			var result = new CategoryDto
-			{
-				ID = category.ID,
-				Name = category.Name
-			};
-
-			return Ok(result);
+			return Ok(
+				await _mediator.Send(new CreateCategoryCommand(dto))
+			);
 		}
 
 		[HttpGet("{id}")]
 		[Produces(typeof(CategoryDto))]
 		public async Task<IActionResult> Get(Int32 id)
 		{
-			if (id <= 0)
-			{
-				throw new ValidationException($"{nameof(id)} is invalid");
-			}
-
-			var category = await _dbContext.Categories.FindAsync(id);
-			if (category == null)
-			{
-				throw new BusinessException("Category is not exists!");
-			}
-
-			var result = new CategoryDto
-			{
-				ID = category.ID,
-				Name = category.Name
-			};
-
-			return Ok(result);
+			return Ok(
+				await _mediator.Send(new GetCategoryQuery(id))
+			);
 		}
 
 		[HttpPut("{id}")]
 		[Produces(typeof(CategoryDto))]
 		public async Task<IActionResult> Put(Int32 id, CategoryDto dto)
 		{
-			if (id <= 0)
-			{
-				throw new ValidationException($"{nameof(id)} is invalid");
-			}
-
-			if (dto == null)
-			{
-				throw new ValidationException($"{nameof(dto)} is invalid");
-			}
-
-			var category = await _dbContext.Categories.FindAsync(id);
-			if (category == null)
-			{
-				throw new BusinessException("Category is not exists!");
-			}
-
-			category.Name = dto.Name;
-
-			await _dbContext.SaveChangesAsync();
-
-			var result = new CategoryDto
-			{
-				ID = category.ID,
-				Name = category.Name
-			};
-
-			return Ok(result);
+			return Ok(
+				await _mediator.Send(new UpdateCategoryCommand(id, dto))
+			);
 		}
 
 		[HttpDelete("{id}")]
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
 		public async Task<IActionResult> Delete(Int32 id)
 		{
-			if (id <= 0)
-			{
-				throw new ValidationException($"{nameof(id)} is invalid");
-			}
-
-			var category = await _dbContext.Categories.FindAsync(id);
-			if (category == null)
-			{
-				throw new BusinessException("Category is not exists!");
-			}
-
-			_dbContext.Categories.Remove(category);
-			await _dbContext.SaveChangesAsync();
+			await _mediator.Send(new DeleteCategoryCommand(id));
 
 			return NoContent();
 		}

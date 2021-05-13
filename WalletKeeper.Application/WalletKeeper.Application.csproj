@@ -5,16 +5,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="Commands\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="MediatR" Version="9.0.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\WalletKeeper.Domain\WalletKeeper.Domain.csproj" />
+		<ProjectReference Include="..\WalletKeeper.Persistence\WalletKeeper.Persistence.csproj" />
 	</ItemGroup>
 
 </Project>
