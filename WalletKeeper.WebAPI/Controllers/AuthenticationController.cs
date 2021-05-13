@@ -37,7 +37,7 @@ namespace WalletKeeper.WebAPI.Controllers
 		public async Task<IActionResult> GetUserInfo()
 		{
 			return Ok(
-				await _mediator.Send(new GetUserInfoQuery(User))
+				await _mediator.Send(new GetUserInfoQuery())
 			);
 		}
 	}

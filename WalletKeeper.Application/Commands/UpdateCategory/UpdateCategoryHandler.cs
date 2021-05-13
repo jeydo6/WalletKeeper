@@ -12,6 +12,7 @@ namespace WalletKeeper.Application.Commands
 	public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, CategoryDto>
 	{
 		private readonly ApplicationDbContext _dbContext;
+
 		private readonly ILogger<UpdateCategoryHandler> _logger;
 
 		public UpdateCategoryHandler(

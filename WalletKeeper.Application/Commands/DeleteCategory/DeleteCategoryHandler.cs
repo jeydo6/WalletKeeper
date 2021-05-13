@@ -11,6 +11,7 @@ namespace WalletKeeper.Application.Commands
 	public class DeleteCategoryHandler : IRequestHandler<DeleteCategoryCommand>
 	{
 		private readonly ApplicationDbContext _dbContext;
+
 		private readonly ILogger<DeleteCategoryHandler> _logger;
 
 		public DeleteCategoryHandler(

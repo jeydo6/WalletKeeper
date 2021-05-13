@@ -18,6 +18,7 @@ namespace WalletKeeper.Application.Queries
 	{
 		private readonly UserManager<User> _userManager;
 		private readonly AuthenticationConfig _authenticationConfig;
+
 		private readonly IUserClaimsPrincipalFactory<User> _claimsPrincipalFactory;
 		private readonly ILogger<GetUserTokenHandler> _logger;
 

@@ -3,7 +3,7 @@ using WalletKeeper.Application.Dto;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetUserInfoQuery : IRequest<UserInfoDto>
+	public class GetProductItemsQuery : IRequest<ProductItemDto[]>
 	{
 		//
 	}

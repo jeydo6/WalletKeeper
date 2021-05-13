@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,8 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Domain.Configs;
@@ -206,6 +209,12 @@ namespace WalletKeeper.WebAPI
 				.AddDefaultTokenProviders();
 
 			services
+				.AddScoped<IPrincipal, ClaimsPrincipal>(sp =>
+				{
+					var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
+
+					return httpContextAccessor.HttpContext.User;
+				})
 				.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory>();
 
 			services

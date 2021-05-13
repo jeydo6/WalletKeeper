@@ -14,6 +14,7 @@ namespace WalletKeeper.Application.Commands
 	public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, CategoryDto>
 	{
 		private readonly ApplicationDbContext _dbContext;
+
 		private readonly ILogger<CreateCategoryHandler> _logger;
 
 		public CreateCategoryHandler(

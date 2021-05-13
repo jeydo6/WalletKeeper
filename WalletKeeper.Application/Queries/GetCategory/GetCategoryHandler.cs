@@ -12,6 +12,7 @@ namespace WalletKeeper.Application.Queries
 	public class GetCategoryHandler : IRequestHandler<GetCategoryQuery, CategoryDto>
 	{
 		private readonly ApplicationDbContext _dbContext;
+
 		private readonly ILogger<GetCategoryHandler> _logger;
 
 		public GetCategoryHandler(
