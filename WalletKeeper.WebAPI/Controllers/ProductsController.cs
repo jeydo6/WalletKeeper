@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using WalletKeeper.Application.Commands;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Domain.Entities;
-using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Application.Queries;
 
 namespace WalletKeeper.WebAPI.Controllers
 {
@@ -18,146 +15,56 @@ namespace WalletKeeper.WebAPI.Controllers
 	[Route("products")]
 	public class ProductsController : ControllerBase
 	{
-		private readonly ApplicationDbContext _dbContext;
-		private readonly ILogger<ProductsController> _logger;
+		private readonly IMediator _mediator;
 
 		public ProductsController(
-			ApplicationDbContext dbContext,
-			ILogger<ProductsController> logger
+			IMediator mediator
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			_mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 		}
 
 		[HttpGet]
 		[Produces(typeof(ProductDto[]))]
 		public async Task<IActionResult> List()
 		{
-			var products = await _dbContext.Products.ToListAsync();
-
-			var result = products.Select(p => new ProductDto
-			{
-				ID = p.ID,
-				Name = p.Name,
-				CategoryID = p.CategoryID
-			}).ToArray();
-
-			return Ok(result);
+			return Ok(
+				await _mediator.Send(new GetProductsQuery())
+			);
 		}
 
 		[HttpPost]
 		[Produces(typeof(ProductDto))]
 		public async Task<IActionResult> Post(ProductDto dto)
 		{
-			if (dto == null)
-			{
-				throw new ValidationException($"{nameof(dto)} is invalid");
-			}
-
-			var product = await _dbContext.Products.FirstOrDefaultAsync(c => c.Name == dto.Name);
-			if (product != null)
-			{
-				throw new BusinessException("Product already exists!");
-			}
-
-			product = new Product
-			{
-				Name = dto.Name,
-				CategoryID = dto.CategoryID
-			};
-
-			await _dbContext.Products.AddAsync(product);
-			await _dbContext.SaveChangesAsync();
-
-			var result = new ProductDto
-			{
-				ID = product.ID,
-				Name = product.Name,
-				CategoryID = product.CategoryID
-			};
-
-			return Ok(result);
+			return Ok(
+				await _mediator.Send(new CreateProductCommand(dto))
+			);
 		}
 
 		[HttpGet("{id}")]
 		[Produces(typeof(ProductDto))]
 		public async Task<IActionResult> Get(Int32 id)
 		{
-			if (id <= 0)
-			{
-				throw new ValidationException($"{nameof(id)} is invalid");
-			}
-
-			var product = await _dbContext.Products.FindAsync(id);
-			if (product == null)
-			{
-				throw new BusinessException("Product is not exists!");
-			}
-
-			var result = new ProductDto
-			{
-				ID = product.ID,
-				Name = product.Name,
-				CategoryID = product.CategoryID
-			};
-
-			return Ok(result);
+			return Ok(
+				await _mediator.Send(new GetProductQuery(id))
+			);
 		}
 
 		[HttpPut("{id}")]
 		[Produces(typeof(ProductDto))]
 		public async Task<IActionResult> Put(Int32 id, ProductDto dto)
 		{
-			if (id <= 0)
-			{
-				throw new ValidationException($"{nameof(id)} is invalid");
-			}
-
-			if (dto == null)
-			{
-				throw new ValidationException($"{nameof(dto)} is invalid");
-			}
-
-			var product = await _dbContext.Products.FindAsync(id);
-			if (product == null)
-			{
-				throw new BusinessException("Product is not exists!");
-			}
-
-			product.Name = dto.Name;
-			product.CategoryID = dto.CategoryID;
-			product.Category = null;
-
-			await _dbContext.SaveChangesAsync();
-
-			var result = new ProductDto
-			{
-				ID = product.ID,
-				Name = product.Name,
-				CategoryID = product.CategoryID
-			};
-
-			return Ok(result);
+			return Ok(
+				await _mediator.Send(new UpdateProductCommand(id, dto))
+			);
 		}
 
 		[HttpDelete("{id}")]
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
 		public async Task<IActionResult> Delete(Int32 id)
 		{
-			if (id <= 0)
-			{
-				throw new ValidationException($"{nameof(id)} is invalid");
-			}
-
-			var product = await _dbContext.Products.FindAsync(id);
-			if (product == null)
-			{
-				throw new BusinessException("Product is not exists!");
-			}
-
-			_dbContext.Products.Remove(product);
-			await _dbContext.SaveChangesAsync();
+			await _mediator.Send(new DeleteProductCommand(id));
 
 			return NoContent();
 		}

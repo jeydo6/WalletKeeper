@@ -1,18 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Domain.Configs;
-using WalletKeeper.Domain.Entities;
-using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.Application.Queries;
 
 namespace WalletKeeper.WebAPI.Controllers
 {
@@ -21,89 +13,32 @@ namespace WalletKeeper.WebAPI.Controllers
 	[Route("authentication")]
 	public class AuthenticationController : ControllerBase
 	{
-		private readonly UserManager<User> _userManager;
-		private readonly AuthenticationConfig _authenticationConfig;
-		private readonly IUserClaimsPrincipalFactory<User> _claimsPrincipalFactory;
-		private readonly ILogger<AuthenticationController> _logger;
+		private readonly IMediator _mediator;
 
 		public AuthenticationController(
-			UserManager<User> userManager,
-			IOptionsSnapshot<AuthenticationConfig> authenticationConfigOptions,
-			IUserClaimsPrincipalFactory<User> claimsPrincipalFactory,
-			ILogger<AuthenticationController> logger
+			IMediator mediator
 		)
 		{
-			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-			_authenticationConfig = authenticationConfigOptions != null ? authenticationConfigOptions.Value : throw new ArgumentNullException(nameof(authenticationConfigOptions));
-			_claimsPrincipalFactory = claimsPrincipalFactory ?? throw new ArgumentNullException(nameof(claimsPrincipalFactory));
-			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			_mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 		}
 
 		[AllowAnonymous]
 		[HttpPost]
 		[Produces(typeof(String))]
-		public async Task<IActionResult> GetTokenAsync(LoginDto login)
+		public async Task<IActionResult> GetToken(LoginDto dto)
 		{
-			if (String.IsNullOrWhiteSpace(login.UserName))
-			{
-				throw new ValidationException("UserName cannot be empty!");
-			}
-
-			if (String.IsNullOrEmpty(login.Password))
-			{
-				throw new ValidationException("Password cannot be empty!");
-			}
-
-			var user = await _userManager.FindByNameAsync(login.UserName);
-			if (user == null || !await _userManager.CheckPasswordAsync(user, login.Password))
-			{
-				throw new BusinessException("Invalid username or password");
-			}
-
-			var identity = await _claimsPrincipalFactory.CreateAsync(user);
-			if (identity == null)
-			{
-				throw new BusinessException("Invalid username or password");
-			}
-
-			var key = new SymmetricSecurityKey(
-				Encoding.UTF8.GetBytes(_authenticationConfig.Secret)
-			);
-
-			var jwt = new JwtSecurityToken(
-				issuer: _authenticationConfig.Issuer,
-				notBefore: DateTime.UtcNow,
-				expires: DateTime.UtcNow.AddDays(14),
-				claims: identity.Claims,
-				signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
-			);
-
 			return Ok(
-				new JwtSecurityTokenHandler()
-					.WriteToken(jwt)
+				await _mediator.Send(new GetUserTokenQuery(dto))
 			);
 		}
 
 		[HttpGet]
 		[Produces(typeof(UserInfoDto))]
-		public IActionResult GetClaims()
+		public async Task<IActionResult> GetUserInfo()
 		{
-			var userInfo = new UserInfoDto
-			{
-				IsAuthenticated = true,
-				Claims = User.Claims
-					.Select(c => new ClaimDto
-					{
-						Type = c.Type,
-						Value = c.Value,
-						ValueType = c.ValueType,
-						Issuer = c.Issuer,
-						OriginalIssuer = c.OriginalIssuer
-					})
-					.ToArray()
-			};
-
-			return Ok(userInfo);
+			return Ok(
+				await _mediator.Send(new GetUserInfoQuery())
+			);
 		}
 	}
 }

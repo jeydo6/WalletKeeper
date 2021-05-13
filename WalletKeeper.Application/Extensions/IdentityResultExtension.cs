@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using WalletKeeper.Domain.Exceptions;
 
-namespace WalletKeeper.WebAPI.Extensions
+namespace WalletKeeper.Application.Extensions
 {
 	public static class IdentityResultExtension
 	{
