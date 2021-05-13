@@ -23,12 +23,11 @@ namespace WalletKeeper.WebAPI.Controllers
 			_mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 		}
 
-
 		[HttpPost("photo")]
 		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> Post(GenericDto<Byte[]> dto)
 		{
-			var barcodeString = await _mediator.Send(new DecodeQRCodeQuery(dto.Value));
+			var barcodeString = await _mediator.Send(new GetQRCodeStringQuery(dto.Value));
 
 			return Ok(
 				await _mediator.Send(new CreateReceiptCommand(barcodeString))
