@@ -41,7 +41,6 @@ namespace WalletKeeper.Application.Queries
 		public async Task<Unit> Handle(ConfirmUserEmailQuery request, CancellationToken cancellationToken)
 		{
 			var userID = _principal.GetUserID();
-
 			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{

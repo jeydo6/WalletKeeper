@@ -46,7 +46,6 @@ namespace WalletKeeper.Application.Queries
 			}
 
 			var userID = _principal.GetUserID();
-
 			var user = await _userManager.FindByIdAsync(userID);
 			if (user == null)
 			{
