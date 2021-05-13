@@ -111,7 +111,12 @@ namespace WalletKeeper.WebAPI
 				.AddMediatR(typeof(Application.AssemblyMarker));
 
 			services
-				.AddSingleton<EmailMessageFactory>();
+				.AddAuthentication(options =>
+				{
+					options.AuthenticationConfig = Configuration
+						.GetSection($"{nameof(AuthenticationConfig)}")
+						.Get<AuthenticationConfig>();
+				});
 
 			services
 				.AddHttpClient<IFiscalDataService, FiscalDataService>((sp, httpClient) =>
@@ -123,16 +128,11 @@ namespace WalletKeeper.WebAPI
 				});
 
 			services
-				.AddSingleton<IBarcodeDecoder, MagickBarcodeDecoder>()
-				.AddSingleton<IEmailService, EmailService>();
+				.AddSingleton<MagickQRCodeDecoder>()
+				.AddSingleton<EmailMessageFactory>();
 
 			services
-				.AddAuthentication(options =>
-				{
-					options.AuthenticationConfig = Configuration
-						.GetSection($"{nameof(AuthenticationConfig)}")
-						.Get<AuthenticationConfig>();
-				});
+				.AddSingleton<IEmailService, EmailService>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -1,16 +1,17 @@
 ﻿using ImageMagick;
 using System;
+using WalletKeeper.Barcodes.Enumerations;
 using WalletKeeper.Barcodes.Readers;
 using ZXing;
 
 namespace WalletKeeper.Barcodes.Decoders
 {
-	public class MagickBarcodeDecoder : IBarcodeDecoder
+	public abstract class MagickBarcodeDecoder : IBarcodeDecoder
 	{
 		private readonly MagickBarcodeReader _reader;
 		private readonly Func<IMagickImage, Result>[] _methods;
 
-		public MagickBarcodeDecoder()
+		public MagickBarcodeDecoder(BarcodeFormatEnum barcodeFormat)
 		{
 			_methods = new Func<IMagickImage, Result>[]
 			{
@@ -23,7 +24,7 @@ namespace WalletKeeper.Barcodes.Decoders
 			_reader = new MagickBarcodeReader();
 			_reader.Options.PossibleFormats = new BarcodeFormat[]
 			{
-				BarcodeFormat.QR_CODE
+				(BarcodeFormat)barcodeFormat
 			};
 			_reader.Options.TryHarder = true;
 		}
@@ -86,6 +87,5 @@ namespace WalletKeeper.Barcodes.Decoders
 			image.AutoThreshold(AutoThresholdMethod.Triangle);
 			return _reader.Decode(image);
 		}
-
 	}
 }
