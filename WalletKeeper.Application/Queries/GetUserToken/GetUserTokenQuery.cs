@@ -4,9 +4,9 @@ using WalletKeeper.Application.Dto;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetTokenQuery : IRequest<String>
+	public class GetUserTokenQuery : IRequest<String>
 	{
-		public GetTokenQuery(LoginDto dto)
+		public GetUserTokenQuery(LoginDto dto)
 		{
 			Dto = dto;
 		}

@@ -14,18 +14,18 @@ using WalletKeeper.Domain.Exceptions;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetTokenHandler : IRequestHandler<GetTokenQuery, String>
+	public class GetUserTokenHandler : IRequestHandler<GetUserTokenQuery, String>
 	{
 		private readonly UserManager<User> _userManager;
 		private readonly AuthenticationConfig _authenticationConfig;
 		private readonly IUserClaimsPrincipalFactory<User> _claimsPrincipalFactory;
-		private readonly ILogger<GetTokenHandler> _logger;
+		private readonly ILogger<GetUserTokenHandler> _logger;
 
-		public GetTokenHandler(
+		public GetUserTokenHandler(
 			UserManager<User> userManager,
 			IOptionsSnapshot<AuthenticationConfig> authenticationConfigOptions,
 			IUserClaimsPrincipalFactory<User> claimsPrincipalFactory,
-			ILogger<GetTokenHandler> logger
+			ILogger<GetUserTokenHandler> logger
 		)
 		{
 			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -34,7 +34,7 @@ namespace WalletKeeper.Application.Queries
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<String> Handle(GetTokenQuery request, CancellationToken cancellationToken)
+		public async Task<String> Handle(GetUserTokenQuery request, CancellationToken cancellationToken)
 		{
 			if (String.IsNullOrWhiteSpace(request.Dto.UserName))
 			{

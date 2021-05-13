@@ -28,7 +28,7 @@ namespace WalletKeeper.WebAPI.Controllers
 		public async Task<IActionResult> GetToken(LoginDto dto)
 		{
 			return Ok(
-				await _mediator.Send(new GetTokenQuery(dto))
+				await _mediator.Send(new GetUserTokenQuery(dto))
 			);
 		}
 
