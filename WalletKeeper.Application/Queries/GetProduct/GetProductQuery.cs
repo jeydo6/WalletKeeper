@@ -4,9 +4,9 @@ using WalletKeeper.Application.Dto;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetProductItemQuery : IRequest<ProductItemDto>
+	public class GetProductQuery : IRequest<ProductDto>
 	{
-		public GetProductItemQuery(Int32 id)
+		public GetProductQuery(Int32 id)
 		{
 			ID = id;
 		}
