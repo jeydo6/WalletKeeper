@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,17 +13,17 @@ using WalletKeeper.Persistence.DbContexts;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetProductItemHandler : IRequestHandler<GetProductItemQuery, ProductItemDto>
+	public class GetReceiptsHandler : IRequestHandler<GetReceiptsQuery, ReceiptDto[]>
 	{
 		private readonly ApplicationDbContext _dbContext;
 
 		private readonly IPrincipal _principal;
-		private readonly ILogger<GetProductItemHandler> _logger;
+		private readonly ILogger<GetReceiptsHandler> _logger;
 
-		public GetProductItemHandler(
+		public GetReceiptsHandler(
 			ApplicationDbContext dbContext,
 			IPrincipal principal,
-			ILogger<GetProductItemHandler> logger
+			ILogger<GetReceiptsHandler> logger
 		)
 		{
 			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -30,34 +31,25 @@ namespace WalletKeeper.Application.Queries
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<ProductItemDto> Handle(GetProductItemQuery request, CancellationToken cancellationToken)
+		public async Task<ReceiptDto[]> Handle(GetReceiptsQuery request, CancellationToken cancellationToken)
 		{
-			if (request.ID <= 0)
-			{
-				throw new ValidationException($"{nameof(request.ID)} is invalid");
-			}
-
 			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
 			{
 				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
-			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == request.ID && pi.Receipt.UserID == userID, cancellationToken);
-			if (productItem == null)
-			{
-				throw new BusinessException("ProductItem is not exists!");
-			}
-
-			var result = new ProductItemDto
-			{
-				ID = productItem.ID,
-				Name = productItem.Name,
-				Price = productItem.Price,
-				Quantity = productItem.Quantity,
-				Sum = productItem.Sum,
-				ProductID = productItem.ProductID,
-				ReceiptID = productItem.ReceiptID
-			};
+			var result = await _dbContext.Receipts
+				.Where(r => r.UserID == userID)
+				.Select(r => new ReceiptDto
+				{
+					FiscalDocumentNumber = r.FiscalDocumentNumber,
+					FiscalDriveNumber = r.FiscalDriveNumber,
+					FiscalType = r.FiscalType,
+					DateTime = r.DateTime,
+					TotalSum = r.TotalSum,
+					OperationType = r.OperationType
+				})
+				.ToArrayAsync(cancellationToken);
 
 			return result;
 		}

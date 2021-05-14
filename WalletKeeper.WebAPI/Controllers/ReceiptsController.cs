@@ -23,6 +23,15 @@ namespace WalletKeeper.WebAPI.Controllers
 			_mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 		}
 
+		[HttpGet]
+		[Produces(typeof(ReceiptDto[]))]
+		public async Task<IActionResult> List()
+		{
+			return Ok(
+				await _mediator.Send(new GetReceiptsQuery())
+			);
+		}
+
 		[HttpPost("photo")]
 		[Produces(typeof(ReceiptDto))]
 		public async Task<IActionResult> Post(GenericDto<Byte[]> dto)
@@ -42,6 +51,15 @@ namespace WalletKeeper.WebAPI.Controllers
 
 			return Ok(
 				await _mediator.Send(new CreateReceiptCommand(barcodeString))
+			);
+		}
+
+		[HttpGet("{id}")]
+		[Produces(typeof(ReceiptDto))]
+		public async Task<IActionResult> Get(Int32 id)
+		{
+			return Ok(
+				await _mediator.Send(new GetReceiptQuery(id))
 			);
 		}
 	}

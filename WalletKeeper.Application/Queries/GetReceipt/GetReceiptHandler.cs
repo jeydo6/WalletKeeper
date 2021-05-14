@@ -12,17 +12,17 @@ using WalletKeeper.Persistence.DbContexts;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetProductItemHandler : IRequestHandler<GetProductItemQuery, ProductItemDto>
+	public class GetReceiptHandler : IRequestHandler<GetReceiptQuery, ReceiptDto>
 	{
 		private readonly ApplicationDbContext _dbContext;
 
 		private readonly IPrincipal _principal;
-		private readonly ILogger<GetProductItemHandler> _logger;
+		private readonly ILogger<GetReceiptHandler> _logger;
 
-		public GetProductItemHandler(
+		public GetReceiptHandler(
 			ApplicationDbContext dbContext,
 			IPrincipal principal,
-			ILogger<GetProductItemHandler> logger
+			ILogger<GetReceiptHandler> logger
 		)
 		{
 			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -30,7 +30,7 @@ namespace WalletKeeper.Application.Queries
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<ProductItemDto> Handle(GetProductItemQuery request, CancellationToken cancellationToken)
+		public async Task<ReceiptDto> Handle(GetReceiptQuery request, CancellationToken cancellationToken)
 		{
 			if (request.ID <= 0)
 			{
@@ -42,24 +42,24 @@ namespace WalletKeeper.Application.Queries
 				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
-			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == request.ID && pi.Receipt.UserID == userID, cancellationToken);
-			if (productItem == null)
+			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.ID == request.ID && r.UserID == userID, cancellationToken);
+			if (receipt == null)
 			{
 				throw new BusinessException("ProductItem is not exists!");
 			}
 
-			var result = new ProductItemDto
+			var result = new ReceiptDto
 			{
-				ID = productItem.ID,
-				Name = productItem.Name,
-				Price = productItem.Price,
-				Quantity = productItem.Quantity,
-				Sum = productItem.Sum,
-				ProductID = productItem.ProductID,
-				ReceiptID = productItem.ReceiptID
+				FiscalDocumentNumber = receipt.FiscalDocumentNumber,
+				FiscalDriveNumber = receipt.FiscalDriveNumber,
+				FiscalType = receipt.FiscalType,
+				DateTime = receipt.DateTime,
+				TotalSum = receipt.TotalSum,
+				OperationType = receipt.OperationType
 			};
 
 			return result;
+
 		}
 	}
 }
