@@ -4,22 +4,21 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class DeleteProductHandler : IRequestHandler<DeleteProductCommand>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
+		private readonly IProductsRepository _repository;
 		private readonly ILogger<DeleteProductHandler> _logger;
 
 		public DeleteProductHandler(
-			ApplicationDbContext dbContext,
+			IProductsRepository repository,
 			ILogger<DeleteProductHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -30,14 +29,7 @@ namespace WalletKeeper.Application.Commands
 				throw new ValidationException($"{nameof(request.ID)} is invalid");
 			}
 
-			var product = await _dbContext.Products.FindAsync(request.ID);
-			if (product == null)
-			{
-				throw new BusinessException("Product is not exists!");
-			}
-
-			_dbContext.Products.Remove(product);
-			await _dbContext.SaveChangesAsync(cancellationToken);
+			await _repository.DeleteAsync(request.ID, cancellationToken);
 
 			return Unit.Value;
 		}

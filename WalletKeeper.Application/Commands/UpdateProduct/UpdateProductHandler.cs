@@ -4,23 +4,23 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
+using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, ProductDto>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
+		private readonly IProductsRepository _repository;
 		private readonly ILogger<UpdateProductHandler> _logger;
 
 		public UpdateProductHandler(
-			ApplicationDbContext dbContext,
+			IProductsRepository repository,
 			ILogger<UpdateProductHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -36,17 +36,13 @@ namespace WalletKeeper.Application.Commands
 				throw new ValidationException($"{nameof(request.Dto)} is invalid");
 			}
 
-			var product = await _dbContext.Products.FindAsync(new Object[] { request.ID }, cancellationToken);
-			if (product == null)
+			var item = new Product
 			{
-				throw new BusinessException("Product is not exists!");
-			}
+				Name = request.Dto.Name,
+				CategoryID = request.Dto.CategoryID
+			};
 
-			product.Name = request.Dto.Name;
-			product.CategoryID = request.Dto.CategoryID;
-			product.Category = null;
-
-			await _dbContext.SaveChangesAsync(cancellationToken);
+			var product = await _repository.UpdateAsync(request.ID, item, cancellationToken);
 
 			var result = new ProductDto
 			{
