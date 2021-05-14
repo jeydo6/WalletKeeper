@@ -58,7 +58,7 @@ namespace WalletKeeper.Persistence.Repositories
 				CategoryID = item.CategoryID
 			};
 
-			await _dbContext.Products.AddAsync(item, cancellationToken);
+			await _dbContext.Products.AddAsync(product, cancellationToken);
 			await _dbContext.SaveChangesAsync(cancellationToken);
 
 			return product;

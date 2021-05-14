@@ -75,7 +75,7 @@ namespace WalletKeeper.Persistence.Repositories
 			}
 
 			productItem.Name = item.Name;
-			productItem.ProductID = item.Product.ID;
+			productItem.ProductID = item.ProductID;
 			productItem.Product = null;
 
 			await _dbContext.SaveChangesAsync(cancellationToken);

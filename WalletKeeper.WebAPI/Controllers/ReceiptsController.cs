@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Commands;
 using WalletKeeper.Application.Dto;
@@ -60,6 +61,15 @@ namespace WalletKeeper.WebAPI.Controllers
 		{
 			return Ok(
 				await _mediator.Send(new GetReceiptQuery(id))
+			);
+		}
+
+		[HttpDelete("{id}")]
+		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
+		public async Task<IActionResult> Delete(Int32 id)
+		{
+			return Ok(
+				await _mediator.Send(new DeleteReceiptCommand(id))
 			);
 		}
 	}
