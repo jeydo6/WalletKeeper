@@ -1,14 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Repositories;
-using WalletKeeper.Domain.Types;
 using WalletKeeper.Persistence.DbContexts;
 
 namespace WalletKeeper.Persistence.Repositories
@@ -30,15 +27,10 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task<Category[]> GetAsync(CancellationToken cancellationToken = default)
 		{
-			var result = await _dbContext.Categories
-				.Select(c => new Category
-				{
-					ID = c.ID,
-					Name = c.Name
-				})
+			var categories = await _dbContext.Categories
 				.ToArrayAsync(cancellationToken);
 
-			return result;
+			return categories;
 		}
 
 		public async Task<Category> GetAsync(Int32 id, CancellationToken cancellationToken = default)
@@ -49,13 +41,7 @@ namespace WalletKeeper.Persistence.Repositories
 				throw new BusinessException("Category is not exists!");
 			}
 
-			var result = new Category
-			{
-				ID = category.ID,
-				Name = category.Name
-			};
-
-			return result;
+			return category;
 		}
 
 		public async Task<Category> CreateAsync(Category item, CancellationToken cancellationToken = default)
@@ -66,21 +52,15 @@ namespace WalletKeeper.Persistence.Repositories
 				throw new BusinessException("Category already exists!");
 			}
 
-			category = new Entities.Category
+			category = new Category
 			{
 				Name = item.Name
 			};
 
-			await _dbContext.Categories.AddAsync(category, cancellationToken);
+			await _dbContext.Categories.AddAsync(item, cancellationToken);
 			await _dbContext.SaveChangesAsync(cancellationToken);
 
-			var result = new Category
-			{
-				ID = category.ID,
-				Name = category.Name
-			};
-
-			return result;
+			return category;
 		}
 
 		public async Task<Category> UpdateAsync(Int32 id, Category item, CancellationToken cancellationToken = default)
@@ -95,13 +75,7 @@ namespace WalletKeeper.Persistence.Repositories
 
 			await _dbContext.SaveChangesAsync(cancellationToken);
 
-			var result = new Category
-			{
-				ID = category.ID,
-				Name = category.Name
-			};
-
-			return result;
+			return category;
 		}
 
 		public async Task DeleteAsync(Int32 id, CancellationToken cancellationToken = default)

@@ -4,9 +4,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
+using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Repositories;
-using WalletKeeper.Domain.Types;
 
 namespace WalletKeeper.Application.Commands
 {
@@ -35,6 +35,7 @@ namespace WalletKeeper.Application.Commands
 			{
 				Name = request.Dto.Name
 			};
+
 			var category = await _repository.CreateAsync(item, cancellationToken);
 
 			var result = new CategoryDto

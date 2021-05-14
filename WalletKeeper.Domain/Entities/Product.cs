@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WalletKeeper.Persistence.Entities
+namespace WalletKeeper.Domain.Entities
 {
 	[Table("Products")]
 	public class Product

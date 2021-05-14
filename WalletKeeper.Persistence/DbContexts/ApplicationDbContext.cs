@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
-using WalletKeeper.Persistence.Entities;
+using WalletKeeper.Domain.Entities;
 
 namespace WalletKeeper.Persistence.DbContexts
 {

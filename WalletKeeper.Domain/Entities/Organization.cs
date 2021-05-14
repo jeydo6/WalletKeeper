@@ -1,12 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WalletKeeper.Persistence.Entities
+namespace WalletKeeper.Domain.Entities
 {
 	[Table("Organizations")]
-	[Index(nameof(INN), IsUnique = true)]
+	//[Index(nameof(INN), IsUnique = true)]
 	public class Organization
 	{
 		[Key]

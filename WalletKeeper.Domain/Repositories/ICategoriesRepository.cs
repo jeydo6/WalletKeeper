@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using WalletKeeper.Domain.Types;
+using WalletKeeper.Domain.Entities;
 
 namespace WalletKeeper.Domain.Repositories
 {

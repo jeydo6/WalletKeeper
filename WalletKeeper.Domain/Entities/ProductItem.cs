@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WalletKeeper.Persistence.Entities
+namespace WalletKeeper.Domain.Entities
 {
 	[Table("ProductItems")]
 	public class ProductItem

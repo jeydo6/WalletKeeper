@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Application.Extensions;
+using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Domain.Types;
@@ -58,7 +59,7 @@ namespace WalletKeeper.Application.Commands
 
 			var newReceipt = await _fiscalDataService.GetReceipt(qrcode);
 
-			receipt = new Persistence.Entities.Receipt
+			receipt = new Receipt
 			{
 				FiscalDocumentNumber = newReceipt.FiscalDocumentNumber,
 				FiscalDriveNumber = newReceipt.FiscalDriveNumber,
@@ -74,7 +75,7 @@ namespace WalletKeeper.Application.Commands
 			receipt.ProductItems = newReceipt.ProductItems
 				.Select(npi =>
 				{
-					var result = new Persistence.Entities.ProductItem
+					var result = new ProductItem
 					{
 						Name = npi.Name,
 						Price = npi.Price,
@@ -100,7 +101,7 @@ namespace WalletKeeper.Application.Commands
 			}
 			else
 			{
-				receipt.Organization = new Persistence.Entities.Organization
+				receipt.Organization = new Organization
 				{
 					INN = newReceipt.Organization.INN,
 					Name = newReceipt.Organization.Name
