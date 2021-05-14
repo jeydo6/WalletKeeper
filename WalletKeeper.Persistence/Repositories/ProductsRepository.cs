@@ -27,8 +27,7 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task<Product[]> GetAsync(CancellationToken cancellationToken = default)
 		{
-			var products = await _dbContext.Products
-				.ToArrayAsync(cancellationToken);
+			var products = await _dbContext.Products.ToArrayAsync(cancellationToken);
 
 			return products;
 		}
@@ -36,10 +35,6 @@ namespace WalletKeeper.Persistence.Repositories
 		public async Task<Product> GetAsync(Int32 id, CancellationToken cancellationToken = default)
 		{
 			var product = await _dbContext.Products.FindAsync(new Object[] { id }, cancellationToken);
-			if (product == null)
-			{
-				throw new BusinessException("Product is not exists!");
-			}
 
 			return product;
 		}

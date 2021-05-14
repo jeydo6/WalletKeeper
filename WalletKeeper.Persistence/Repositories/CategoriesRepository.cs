@@ -27,8 +27,7 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task<Category[]> GetAsync(CancellationToken cancellationToken = default)
 		{
-			var categories = await _dbContext.Categories
-				.ToArrayAsync(cancellationToken);
+			var categories = await _dbContext.Categories.ToArrayAsync(cancellationToken);
 
 			return categories;
 		}
@@ -36,10 +35,6 @@ namespace WalletKeeper.Persistence.Repositories
 		public async Task<Category> GetAsync(Int32 id, CancellationToken cancellationToken = default)
 		{
 			var category = await _dbContext.Categories.FindAsync(new Object[] { id }, cancellationToken);
-			if (category == null)
-			{
-				throw new BusinessException("Category is not exists!");
-			}
 
 			return category;
 		}
@@ -57,7 +52,7 @@ namespace WalletKeeper.Persistence.Repositories
 				Name = item.Name
 			};
 
-			await _dbContext.Categories.AddAsync(item, cancellationToken);
+			await _dbContext.Categories.AddAsync(category, cancellationToken);
 			await _dbContext.SaveChangesAsync(cancellationToken);
 
 			return category;

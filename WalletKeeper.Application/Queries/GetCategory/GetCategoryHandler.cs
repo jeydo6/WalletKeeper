@@ -31,6 +31,10 @@ namespace WalletKeeper.Application.Queries
 			}
 
 			var category = await _repository.GetAsync(request.ID, cancellationToken);
+			if (category == null)
+			{
+				throw new BusinessException("Category is not exists!");
+			}
 
 			var result = new CategoryDto
 			{

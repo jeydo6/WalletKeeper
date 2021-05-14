@@ -53,10 +53,6 @@ namespace WalletKeeper.Persistence.Repositories
 			}
 
 			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == id && pi.Receipt.UserID == userID, cancellationToken);
-			if (productItem == null)
-			{
-				throw new BusinessException("ProductItem is not exists!");
-			}
 
 			return productItem;
 		}

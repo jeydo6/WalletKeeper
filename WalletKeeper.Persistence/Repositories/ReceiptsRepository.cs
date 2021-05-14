@@ -53,10 +53,6 @@ namespace WalletKeeper.Persistence.Repositories
 			}
 
 			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(pi => pi.ID == id && pi.UserID == userID, cancellationToken);
-			if (receipt == null)
-			{
-				throw new BusinessException("ProductItem is not exists!");
-			}
 
 			return receipt;
 		}
@@ -64,10 +60,6 @@ namespace WalletKeeper.Persistence.Repositories
 		public async Task<Receipt> GetAsync(String fiscalDocumentNumber, CancellationToken cancellationToken = default)
 		{
 			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == fiscalDocumentNumber, cancellationToken);
-			if (receipt != null)
-			{
-				throw new BusinessException("Receipt already exists!");
-			}
 
 			return receipt;
 		}

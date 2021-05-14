@@ -31,6 +31,10 @@ namespace WalletKeeper.Application.Queries
 			}
 
 			var productItem = await _repository.GetAsync(request.ID, cancellationToken);
+			if (productItem == null)
+			{
+				throw new BusinessException("ProductItem is not exists!");
+			}
 
 			var result = new ProductItemDto
 			{
