@@ -20,11 +20,13 @@ using System.Text;
 using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Factories;
+using WalletKeeper.Domain.Repositories;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Infrastructure.Services;
 using WalletKeeper.Persistence.DbContexts;
 using WalletKeeper.Persistence.Entities;
 using WalletKeeper.Persistence.Factories;
+using WalletKeeper.Persistence.Repositories;
 using WalletKeeper.WebAPI.Filters;
 using WalletKeeper.WebAPI.Options;
 
@@ -131,6 +133,9 @@ namespace WalletKeeper.WebAPI
 			services
 				.AddSingleton<MagickQRCodeDecoder>()
 				.AddSingleton<EmailMessageFactory>();
+
+			services
+				.AddSingleton<ICategoriesRepository, CategoriesRepository>();
 
 			services
 				.AddSingleton<IEmailService, EmailService>();

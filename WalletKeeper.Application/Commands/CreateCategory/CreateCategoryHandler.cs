@@ -1,28 +1,26 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
-using WalletKeeper.Persistence.Entities;
+using WalletKeeper.Domain.Repositories;
+using WalletKeeper.Domain.Types;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, CategoryDto>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
+		private readonly ICategoriesRepository _repository;
 		private readonly ILogger<CreateCategoryHandler> _logger;
 
 		public CreateCategoryHandler(
-			ApplicationDbContext dbContext,
+			ICategoriesRepository repository,
 			ILogger<CreateCategoryHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -33,19 +31,11 @@ namespace WalletKeeper.Application.Commands
 				throw new ValidationException($"{nameof(request.Dto)} is invalid");
 			}
 
-			var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Name == request.Dto.Name, cancellationToken);
-			if (category != null)
-			{
-				throw new BusinessException("Category already exists!");
-			}
-
-			category = new Category
+			var item = new Category
 			{
 				Name = request.Dto.Name
 			};
-
-			await _dbContext.Categories.AddAsync(category, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
+			var category = await _repository.CreateAsync(item, cancellationToken);
 
 			var result = new CategoryDto
 			{

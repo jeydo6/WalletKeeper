@@ -5,22 +5,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Repositories;
+using WalletKeeper.Domain.Types;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, CategoryDto>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
+		private readonly ICategoriesRepository _repository;
 		private readonly ILogger<UpdateCategoryHandler> _logger;
 
 		public UpdateCategoryHandler(
-			ApplicationDbContext dbContext,
+			ICategoriesRepository repository,
 			ILogger<UpdateCategoryHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -36,15 +36,11 @@ namespace WalletKeeper.Application.Commands
 				throw new ValidationException($"{nameof(request.Dto)} is invalid");
 			}
 
-			var category = await _dbContext.Categories.FindAsync(new Object[] { request.ID }, cancellationToken);
-			if (category == null)
+			var item = new Category
 			{
-				throw new BusinessException("Category is not exists!");
-			}
-
-			category.Name = request.Dto.Name;
-
-			await _dbContext.SaveChangesAsync(cancellationToken);
+				Name = request.Dto.Name
+			};
+			var category = await _repository.UpdateAsync(request.ID, item, cancellationToken);
 
 			var result = new CategoryDto
 			{
