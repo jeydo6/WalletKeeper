@@ -14,4 +14,3 @@ namespace WalletKeeper.Application.Queries
 		public Int32 ID { get; }
 	}
 }
-}
