@@ -135,10 +135,13 @@ namespace WalletKeeper.WebAPI
 				.AddSingleton<EmailMessageFactory>();
 
 			services
-				.AddSingleton<ICategoriesRepository, CategoriesRepository>();
+				.AddSingleton<IEmailService, EmailService>();
 
 			services
-				.AddSingleton<IEmailService, EmailService>();
+				.AddScoped<ICategoriesRepository, CategoriesRepository>()
+				.AddScoped<IProductsRepository, ProductsRepository>()
+				.AddScoped<IProductItemsRepository, ProductItemsRepository>()
+				.AddScoped<IReceiptsRepository, ReceiptsRepository>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
