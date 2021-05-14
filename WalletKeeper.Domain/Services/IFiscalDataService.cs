@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Types;
 
 namespace WalletKeeper.Domain.Services

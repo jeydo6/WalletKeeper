@@ -6,8 +6,8 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Extensions;
-using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.Persistence.Entities;
 
 namespace WalletKeeper.Application.Commands
 {

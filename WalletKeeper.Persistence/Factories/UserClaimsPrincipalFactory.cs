@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using WalletKeeper.Domain.Entities;
+using WalletKeeper.Persistence.Entities;
 
-namespace WalletKeeper.Domain.Factories
+namespace WalletKeeper.Persistence.Factories
 {
 	public class UserClaimsPrincipalFactory : UserClaimsPrincipalFactory<User>
 	{

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WalletKeeper.Domain.Configs;
-using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Domain.Types;

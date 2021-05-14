@@ -56,27 +56,55 @@ namespace WalletKeeper.Application.Commands
 				throw new BusinessException("Receipt already exists!");
 			}
 
-			receipt = await _fiscalDataService.GetReceipt(qrcode);
-			receipt.UserID = userID;
-			receipt.User = null;
+			var newReceipt = await _fiscalDataService.GetReceipt(qrcode);
 
-			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == receipt.Organization.INN, cancellationToken);
+			receipt = new Persistence.Entities.Receipt
+			{
+				FiscalDocumentNumber = newReceipt.FiscalDocumentNumber,
+				FiscalDriveNumber = newReceipt.FiscalDriveNumber,
+				FiscalType = newReceipt.FiscalType,
+				DateTime = newReceipt.DateTime,
+				TotalSum = newReceipt.TotalSum,
+				OperationType = newReceipt.OperationType,
+				Place = newReceipt.Place,
+				UserID = userID,
+			};
+
+			var productItems = await _dbContext.ProductItems.ToListAsync(cancellationToken);
+			receipt.ProductItems = newReceipt.ProductItems
+				.Select(npi =>
+				{
+					var result = new Persistence.Entities.ProductItem
+					{
+						Name = npi.Name,
+						Price = npi.Price,
+						Quantity = npi.Quantity,
+						Sum = npi.Sum,
+						Receipt = receipt
+					};
+
+					var productItem = productItems.FirstOrDefault(pi => pi.Name == npi.Name);
+					if (productItem != null)
+					{
+						result.ProductID = productItem.ProductID;
+					}
+
+					return result;
+				})
+				.ToList();
+
+			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == newReceipt.Organization.INN, cancellationToken);
 			if (organization != null)
 			{
 				receipt.OrganizationID = organization.ID;
-				receipt.Organization = null;
 			}
-
-			var productItems = await _dbContext.ProductItems.ToListAsync(cancellationToken);
-			foreach (var item in receipt.ProductItems)
+			else
 			{
-				var productItem = productItems.FirstOrDefault(pi => pi.Name == item.Name && pi.ProductID != null);
-
-				if (productItem != null)
+				receipt.Organization = new Persistence.Entities.Organization
 				{
-					item.ProductID = productItem.ProductID;
-					item.Product = null;
-				}
+					INN = newReceipt.Organization.INN,
+					Name = newReceipt.Organization.Name
+				};
 			}
 
 			await _dbContext.Receipts.AddAsync(receipt, cancellationToken);

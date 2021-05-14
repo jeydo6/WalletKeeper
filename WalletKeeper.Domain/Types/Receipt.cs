@@ -1,13 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WalletKeeper.Domain.Entities
+namespace WalletKeeper.Domain.Types
 {
-	[Table("Receipts")]
-	[Index(nameof(FiscalDocumentNumber), IsUnique = true)]
 	public class Receipt
 	{
 		public Receipt()
@@ -15,7 +10,6 @@ namespace WalletKeeper.Domain.Entities
 			ProductItems = new List<ProductItem>();
 		}
 
-		[Key]
 		public Int32 ID { get; set; }
 
 		public String FiscalDocumentNumber { get; set; }
@@ -26,21 +20,14 @@ namespace WalletKeeper.Domain.Entities
 
 		public DateTime DateTime { get; set; }
 
-		[Column(TypeName = "decimal(18, 2)")]
 		public Decimal TotalSum { get; set; }
 
 		public Int32 OperationType { get; set; }
 
 		public String Place { get; set; }
 
-		public Int32 OrganizationID { get; set; }
-
 		public Organization Organization { get; set; }
 
 		public List<ProductItem> ProductItems { get; set; }
-
-		public Guid UserID { get; set; }
-
-		public User User { get; set; }
 	}
 }

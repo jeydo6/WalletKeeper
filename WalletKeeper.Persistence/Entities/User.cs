@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace WalletKeeper.Domain.Entities
+namespace WalletKeeper.Persistence.Entities
 {
 	public class User : IdentityUser<Guid>
 	{

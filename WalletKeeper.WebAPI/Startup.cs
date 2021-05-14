@@ -19,11 +19,12 @@ using System.Security.Principal;
 using System.Text;
 using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Domain.Configs;
-using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Infrastructure.Services;
 using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Persistence.Entities;
+using WalletKeeper.Persistence.Factories;
 using WalletKeeper.WebAPI.Filters;
 using WalletKeeper.WebAPI.Options;
 
