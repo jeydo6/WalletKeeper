@@ -9,28 +9,30 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Domain.Configs;
+using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.Entities;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
 {
 	public class GetUserTokenHandler : IRequestHandler<GetUserTokenQuery, String>
 	{
-		private readonly UserManager<User> _userManager;
 		private readonly AuthenticationConfig _authenticationConfig;
 
+		private readonly IUsersRepository _usersRepository;
 		private readonly IUserClaimsPrincipalFactory<User> _claimsPrincipalFactory;
 		private readonly ILogger<GetUserTokenHandler> _logger;
 
 		public GetUserTokenHandler(
 			UserManager<User> userManager,
 			IOptionsSnapshot<AuthenticationConfig> authenticationConfigOptions,
+			IUsersRepository usersRepository,
 			IUserClaimsPrincipalFactory<User> claimsPrincipalFactory,
 			ILogger<GetUserTokenHandler> logger
 		)
 		{
-			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 			_authenticationConfig = authenticationConfigOptions != null ? authenticationConfigOptions.Value : throw new ArgumentNullException(nameof(authenticationConfigOptions));
+			_usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
 			_claimsPrincipalFactory = claimsPrincipalFactory ?? throw new ArgumentNullException(nameof(claimsPrincipalFactory));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
@@ -47,8 +49,8 @@ namespace WalletKeeper.Application.Queries
 				throw new ValidationException("Password cannot be empty!");
 			}
 
-			var user = await _userManager.FindByNameAsync(request.Dto.UserName);
-			if (user == null || !await _userManager.CheckPasswordAsync(user, request.Dto.Password))
+			var user = await _usersRepository.FindAsync(request.Dto.UserName);
+			if(user == null || !await _usersRepository.CheckPasswordAsync(user, request.Dto.Password))
 			{
 				throw new BusinessException("Invalid username or password");
 			}

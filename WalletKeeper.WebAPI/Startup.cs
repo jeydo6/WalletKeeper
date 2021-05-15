@@ -19,12 +19,14 @@ using System.Security.Principal;
 using System.Text;
 using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Domain.Configs;
+using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
+using WalletKeeper.Domain.Repositories;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Infrastructure.Services;
 using WalletKeeper.Persistence.DbContexts;
-using WalletKeeper.Persistence.Entities;
 using WalletKeeper.Persistence.Factories;
+using WalletKeeper.Persistence.Repositories;
 using WalletKeeper.WebAPI.Filters;
 using WalletKeeper.WebAPI.Options;
 
@@ -134,6 +136,13 @@ namespace WalletKeeper.WebAPI
 
 			services
 				.AddSingleton<IEmailService, EmailService>();
+
+			services
+				.AddScoped<ICategoriesRepository, CategoriesRepository>()
+				.AddScoped<IProductsRepository, ProductsRepository>()
+				.AddScoped<IProductItemsRepository, ProductItemsRepository>()
+				.AddScoped<IReceiptsRepository, ReceiptsRepository>()
+				.AddScoped<IUsersRepository, UsersRepository>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

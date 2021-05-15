@@ -1,28 +1,26 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
+using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
-using WalletKeeper.Persistence.Entities;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class CreateProductHandler : IRequestHandler<CreateProductCommand, ProductDto>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
+		private readonly IProductsRepository _repository;
 		private readonly ILogger<CreateProductHandler> _logger;
 
 		public CreateProductHandler(
-			ApplicationDbContext dbContext,
+			IProductsRepository repository,
 			ILogger<CreateProductHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -33,20 +31,13 @@ namespace WalletKeeper.Application.Commands
 				throw new ValidationException($"{nameof(request.Dto)} is invalid");
 			}
 
-			var product = await _dbContext.Products.FirstOrDefaultAsync(c => c.Name == request.Dto.Name, cancellationToken);
-			if (product != null)
-			{
-				throw new BusinessException("Product already exists!");
-			}
-
-			product = new Product
+			var item = new Product
 			{
 				Name = request.Dto.Name,
 				CategoryID = request.Dto.CategoryID
 			};
 
-			await _dbContext.Products.AddAsync(product, cancellationToken);
-			await _dbContext.SaveChangesAsync(cancellationToken);
+			var product = await _repository.CreateAsync(item, cancellationToken);
 
 			var result = new ProductDto
 			{
@@ -56,7 +47,6 @@ namespace WalletKeeper.Application.Commands
 			};
 
 			return result;
-
 		}
 	}
 }

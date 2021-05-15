@@ -1,32 +1,30 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Application.Extensions;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Extensions;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
 {
 	public class GetProductItemHandler : IRequestHandler<GetProductItemQuery, ProductItemDto>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
 		private readonly IPrincipal _principal;
+		private readonly IProductItemsRepository _repository;
 		private readonly ILogger<GetProductItemHandler> _logger;
 
 		public GetProductItemHandler(
-			ApplicationDbContext dbContext,
 			IPrincipal principal,
+			IProductItemsRepository repository,
 			ILogger<GetProductItemHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -42,7 +40,7 @@ namespace WalletKeeper.Application.Queries
 				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
-			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == request.ID && pi.Receipt.UserID == userID, cancellationToken);
+			var productItem = await _repository.GetAsync(request.ID, userID, cancellationToken);
 			if (productItem == null)
 			{
 				throw new BusinessException("ProductItem is not exists!");

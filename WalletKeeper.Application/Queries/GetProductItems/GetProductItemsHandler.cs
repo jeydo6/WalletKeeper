@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -7,27 +6,26 @@ using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Application.Extensions;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Extensions;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
 {
 	public class GetProductItemsHandler : IRequestHandler<GetProductItemsQuery, ProductItemDto[]>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
 		private readonly IPrincipal _principal;
+		private readonly IProductItemsRepository _repository;
 		private readonly ILogger<GetProductItemsHandler> _logger;
 
 		public GetProductItemsHandler(
-			ApplicationDbContext dbContext,
 			IPrincipal principal,
+			IProductItemsRepository repository,
 			ILogger<GetProductItemsHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -38,8 +36,9 @@ namespace WalletKeeper.Application.Queries
 				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
-			var result = await _dbContext.ProductItems
-				.Where(pi => pi.Receipt.UserID == userID)
+			var productItems = await _repository.GetAsync(userID, cancellationToken);
+
+			var result = productItems
 				.Select(pi => new ProductItemDto
 				{
 					ID = pi.ID,
@@ -50,7 +49,7 @@ namespace WalletKeeper.Application.Queries
 					ProductID = pi.ProductID,
 					ReceiptID = pi.ReceiptID
 				})
-				.ToArrayAsync(cancellationToken);
+				.ToArray();
 
 			return result;
 		}

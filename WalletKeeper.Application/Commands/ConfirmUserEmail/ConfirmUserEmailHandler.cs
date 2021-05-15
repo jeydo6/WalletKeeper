@@ -1,32 +1,30 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Application.Extensions;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.Entities;
+using WalletKeeper.Domain.Extensions;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class ConfirmUserEmailHandler : IRequestHandler<ConfirmUserEmailCommand, UserDto>
 	{
-		private readonly UserManager<User> _userManager;
-
 		private readonly IPrincipal _principal;
+		private readonly IUsersRepository _usersRepository;
 		private readonly ILogger<ConfirmUserEmailHandler> _logger;
 
 		public ConfirmUserEmailHandler(
-			UserManager<User> userManager,
 			IPrincipal principal,
+			IUsersRepository usersRepository,
 			ILogger<ConfirmUserEmailHandler> logger
 		)
 		{
-			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
+			_usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -38,14 +36,7 @@ namespace WalletKeeper.Application.Commands
 			}
 
 			var userID = _principal.GetUserID();
-			var user = await _userManager.FindByIdAsync(userID);
-			if (user == null)
-			{
-				throw new BusinessException("User is not exists!");
-			}
-
-			var identityResult = await _userManager.ConfirmEmailAsync(user, request.Token);
-			identityResult.EnsureSuccess("An error occurred while patching a user", _logger);
+			var user = await _usersRepository.ConfirmEmailAsync(userID, request.Token);
 
 			var result = new UserDto
 			{

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using WalletKeeper.Persistence.Entities;
+using WalletKeeper.Domain.Entities;
 
 namespace WalletKeeper.Persistence.Factories
 {

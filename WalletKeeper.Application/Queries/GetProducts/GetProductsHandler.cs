@@ -1,40 +1,40 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
 {
 	public class GetProductsHandler : IRequestHandler<GetProductsQuery, ProductDto[]>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
+		private readonly IProductsRepository _repository;
 		private readonly ILogger<GetProductsHandler> _logger;
 
 		public GetProductsHandler(
-			ApplicationDbContext dbContext,
+			IProductsRepository repository,
 			ILogger<GetProductsHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public async Task<ProductDto[]> Handle(GetProductsQuery request, CancellationToken cancellationToken)
 		{
-			var result = await _dbContext.Products
+			var products = await _repository.GetAsync(cancellationToken);
+
+			var result = products
 				.Select(p => new ProductDto
 				{
 					ID = p.ID,
 					Name = p.Name,
 					CategoryID = p.CategoryID
 				})
-				.ToArrayAsync(cancellationToken);
+				.ToArray();
 
 			return result;
 		}

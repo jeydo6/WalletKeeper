@@ -1,32 +1,31 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Application.Extensions;
+using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Extensions;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class UpdateProductItemHandler : IRequestHandler<UpdateProductItemCommand, ProductItemDto>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
 		private readonly IPrincipal _principal;
+		private readonly IProductItemsRepository _repository;
 		private readonly ILogger<UpdateProductItemHandler> _logger;
 
 		public UpdateProductItemHandler(
-			ApplicationDbContext dbContext,
 			IPrincipal principal,
+			IProductItemsRepository repository,
 			ILogger<UpdateProductItemHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -47,17 +46,18 @@ namespace WalletKeeper.Application.Commands
 				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
-			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == request.ID && pi.Receipt.UserID == userID, cancellationToken);
-			if (productItem == null)
+			var item = new ProductItem
 			{
-				throw new BusinessException("ProductItem is not exists!");
-			}
+				ID = request.Dto.ID,
+				Name = request.Dto.Name,
+				Price = request.Dto.Price,
+				Quantity = request.Dto.Quantity,
+				Sum = request.Dto.Sum,
+				ProductID = request.Dto.ProductID,
+				ReceiptID = request.Dto.ReceiptID
+			};
 
-			productItem.Name = request.Dto.Name;
-			productItem.ProductID = request.Dto.ProductID;
-			productItem.Product = null;
-
-			await _dbContext.SaveChangesAsync(cancellationToken);
+			var productItem = await _repository.UpdateAsync(request.ID, item, userID, cancellationToken);
 
 			var result = new ProductItemDto
 			{
@@ -71,7 +71,6 @@ namespace WalletKeeper.Application.Commands
 			};
 
 			return result;
-
 		}
 	}
 }

@@ -1,32 +1,30 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Application.Extensions;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.Entities;
+using WalletKeeper.Domain.Extensions;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class ChangeUserPasswordHandler : IRequestHandler<ChangeUserPasswordCommand, UserDto>
 	{
-		private readonly UserManager<User> _userManager;
-
 		private readonly IPrincipal _principal;
+		private readonly IUsersRepository _usersRepository;
 		private readonly ILogger<ChangeUserPasswordHandler> _logger;
 
 		public ChangeUserPasswordHandler(
-			UserManager<User> userManager,
 			IPrincipal principal,
+			IUsersRepository usersRepository,
 			ILogger<ChangeUserPasswordHandler> logger
 		)
 		{
-			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
+			_usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -48,14 +46,7 @@ namespace WalletKeeper.Application.Commands
 			}
 
 			var userID = _principal.GetUserID();
-			var user = await _userManager.FindByIdAsync(userID);
-			if (user == null)
-			{
-				throw new BusinessException("User is not exists!");
-			}
-
-			var identityResult = await _userManager.ChangePasswordAsync(user, request.Dto.OldPassword, request.Dto.NewPassword);
-			identityResult.EnsureSuccess("An error occurred while patching a user", _logger);
+			var user = await _usersRepository.ChangePasswordAsync(userID, request.Dto.OldPassword, request.Dto.NewPassword);
 
 			var result = new UserDto
 			{

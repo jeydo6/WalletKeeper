@@ -4,22 +4,21 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class DeleteCategoryHandler : IRequestHandler<DeleteCategoryCommand>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
+		private readonly ICategoriesRepository _repository;
 		private readonly ILogger<DeleteCategoryHandler> _logger;
 
 		public DeleteCategoryHandler(
-			ApplicationDbContext dbContext,
+			ICategoriesRepository repository,
 			ILogger<DeleteCategoryHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -30,14 +29,7 @@ namespace WalletKeeper.Application.Commands
 				throw new ValidationException($"{nameof(request.ID)} is invalid");
 			}
 
-			var category = await _dbContext.Categories.FindAsync(new Object[] { request.ID }, cancellationToken);
-			if (category == null)
-			{
-				throw new BusinessException("Category is not exists!");
-			}
-
-			_dbContext.Categories.Remove(category);
-			await _dbContext.SaveChangesAsync(cancellationToken);
+			await _repository.DeleteAsync(request.ID, cancellationToken);
 
 			return Unit.Value;
 		}

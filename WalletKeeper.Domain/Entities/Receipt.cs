@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WalletKeeper.Domain.Types
+namespace WalletKeeper.Domain.Entities
 {
 	public class Receipt
 	{
@@ -26,8 +26,14 @@ namespace WalletKeeper.Domain.Types
 
 		public String Place { get; set; }
 
+		public Int32 OrganizationID { get; set; }
+
 		public Organization Organization { get; set; }
 
 		public List<ProductItem> ProductItems { get; set; }
+
+		public Guid UserID { get; set; }
+
+		public User User { get; set; }
 	}
 }

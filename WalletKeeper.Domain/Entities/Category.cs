@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WalletKeeper.Domain.Types
+namespace WalletKeeper.Domain.Entities
 {
 	public class Category
 	{

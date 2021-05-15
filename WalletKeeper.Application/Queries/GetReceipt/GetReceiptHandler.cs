@@ -1,32 +1,30 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Application.Extensions;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Extensions;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
 {
 	public class GetReceiptHandler : IRequestHandler<GetReceiptQuery, ReceiptDto>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
 		private readonly IPrincipal _principal;
+		private readonly IReceiptsRepository _repository;
 		private readonly ILogger<GetReceiptHandler> _logger;
 
 		public GetReceiptHandler(
-			ApplicationDbContext dbContext,
 			IPrincipal principal,
+			IReceiptsRepository repository,
 			ILogger<GetReceiptHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -42,7 +40,7 @@ namespace WalletKeeper.Application.Queries
 				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
-			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.ID == request.ID && r.UserID == userID, cancellationToken);
+			var receipt = await _repository.GetAsync(request.ID, userID, cancellationToken);
 			if (receipt == null)
 			{
 				throw new BusinessException("ProductItem is not exists!");
@@ -50,6 +48,7 @@ namespace WalletKeeper.Application.Queries
 
 			var result = new ReceiptDto
 			{
+				ID = receipt.ID,
 				FiscalDocumentNumber = receipt.FiscalDocumentNumber,
 				FiscalDriveNumber = receipt.FiscalDriveNumber,
 				FiscalType = receipt.FiscalType,

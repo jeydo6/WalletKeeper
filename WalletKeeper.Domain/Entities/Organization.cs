@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WalletKeeper.Domain.Types
+namespace WalletKeeper.Domain.Entities
 {
 	public class Organization
 	{

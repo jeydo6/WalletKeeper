@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 
-namespace WalletKeeper.Persistence.Entities
+namespace WalletKeeper.Domain.Entities
 {
 	public class Role : IdentityRole<Guid>
 	{

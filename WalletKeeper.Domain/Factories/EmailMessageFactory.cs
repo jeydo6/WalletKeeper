@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Types;
 
 namespace WalletKeeper.Domain.Factories
@@ -17,6 +18,16 @@ namespace WalletKeeper.Domain.Factories
 
 		public EmailMessage CreateEmailConfirmationMessage(EmailAddress to, String token)
 		{
+			if (to == null)
+			{
+				throw new ValidationException($"{nameof(to)} is invalid");
+			}
+
+			if (String.IsNullOrWhiteSpace(token))
+			{
+				throw new ValidationException($"{nameof(token)} is invalid");
+			}
+
 			_logger.LogDebug($"Start creating an {nameof(EmailMessage)}");
 
 			return new EmailMessage(
@@ -28,6 +39,16 @@ namespace WalletKeeper.Domain.Factories
 
 		public EmailMessage CreateEmailChangingMessage(EmailAddress to, String token)
 		{
+			if (to == null)
+			{
+				throw new ValidationException($"{nameof(to)} is invalid");
+			}
+
+			if (String.IsNullOrWhiteSpace(token))
+			{
+				throw new ValidationException($"{nameof(token)} is invalid");
+			}
+
 			_logger.LogDebug($"Start creating an {nameof(EmailMessage)}");
 
 			return new EmailMessage(
@@ -39,6 +60,16 @@ namespace WalletKeeper.Domain.Factories
 
 		public EmailMessage CreatePasswordResettingMessage(EmailAddress to, String token)
 		{
+			if (to == null)
+			{
+				throw new ValidationException($"{nameof(to)} is invalid");
+			}
+
+			if (String.IsNullOrWhiteSpace(token))
+			{
+				throw new ValidationException($"{nameof(token)} is invalid");
+			}
+
 			_logger.LogDebug($"Start creating an {nameof(EmailMessage)}");
 
 			return new EmailMessage(

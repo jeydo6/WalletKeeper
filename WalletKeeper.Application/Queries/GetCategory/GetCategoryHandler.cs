@@ -5,22 +5,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Persistence.DbContexts;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
 {
 	public class GetCategoryHandler : IRequestHandler<GetCategoryQuery, CategoryDto>
 	{
-		private readonly ApplicationDbContext _dbContext;
-
+		private readonly ICategoriesRepository _repository;
 		private readonly ILogger<GetCategoryHandler> _logger;
 
 		public GetCategoryHandler(
-			ApplicationDbContext dbContext,
+			ICategoriesRepository repository,
 			ILogger<GetCategoryHandler> logger
 		)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -31,7 +30,7 @@ namespace WalletKeeper.Application.Queries
 				throw new ValidationException($"{nameof(request.ID)} is invalid");
 			}
 
-			var category = await _dbContext.Categories.FindAsync(new Object[] { request.ID }, cancellationToken);
+			var category = await _repository.GetAsync(request.ID, cancellationToken);
 			if (category == null)
 			{
 				throw new BusinessException("Category is not exists!");
