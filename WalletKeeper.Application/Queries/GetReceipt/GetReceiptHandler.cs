@@ -48,6 +48,7 @@ namespace WalletKeeper.Application.Queries
 
 			var result = new ReceiptDto
 			{
+				ID = receipt.ID,
 				FiscalDocumentNumber = receipt.FiscalDocumentNumber,
 				FiscalDriveNumber = receipt.FiscalDriveNumber,
 				FiscalType = receipt.FiscalType,
