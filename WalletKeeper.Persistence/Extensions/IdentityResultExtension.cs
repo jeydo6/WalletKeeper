@@ -6,7 +6,7 @@ using WalletKeeper.Domain.Exceptions;
 
 namespace WalletKeeper.Persistence.Extensions
 {
-	public static class IdentityResultExtension
+	internal static class IdentityResultExtension
 	{
 		public static void EnsureSuccess(this IdentityResult identityResult, String errorMessage, ILogger logger)
 		{
