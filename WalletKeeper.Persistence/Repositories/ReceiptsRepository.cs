@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Domain.Entities;
@@ -16,17 +15,14 @@ namespace WalletKeeper.Persistence.Repositories
 	{
 		private readonly ApplicationDbContext _dbContext;
 
-		private readonly IPrincipal _principal;
 		private readonly ILogger<ReceiptsRepository> _logger;
 
 		public ReceiptsRepository(
 			ApplicationDbContext dbContext,
-			IPrincipal principal,
 			ILogger<ReceiptsRepository> logger
 		)
 		{
 			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -41,7 +37,7 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task<Receipt> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(pi => pi.ID == id && pi.UserID == userID, cancellationToken);
+			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.ID == id && r.UserID == userID, cancellationToken);
 
 			return receipt;
 		}
@@ -71,6 +67,7 @@ namespace WalletKeeper.Persistence.Repositories
 			if (organization != null)
 			{
 				item.OrganizationID = organization.ID;
+				item.Organization = null;
 			}
 
 			await _dbContext.Receipts.AddAsync(item, cancellationToken);
@@ -81,13 +78,17 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task DeleteAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(pi => pi.ID == id && pi.UserID == userID, cancellationToken);
+			var receipt = await _dbContext.Receipts
+				.Include(r => r.ProductItems)
+				.FirstOrDefaultAsync(r => r.ID == id && r.UserID == userID, cancellationToken);
+
 			if (receipt == null)
 			{
 				throw new BusinessException("ProductItem is not exists!");
 			}
 
 			_dbContext.Receipts.Remove(receipt);
+			_dbContext.ProductItems.RemoveRange(receipt.ProductItems);
 			await _dbContext.SaveChangesAsync(cancellationToken);
 		}
 	}

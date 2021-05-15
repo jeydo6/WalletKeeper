@@ -141,7 +141,8 @@ namespace WalletKeeper.WebAPI
 				.AddScoped<ICategoriesRepository, CategoriesRepository>()
 				.AddScoped<IProductsRepository, ProductsRepository>()
 				.AddScoped<IProductItemsRepository, ProductItemsRepository>()
-				.AddScoped<IReceiptsRepository, ReceiptsRepository>();
+				.AddScoped<IReceiptsRepository, ReceiptsRepository>()
+				.AddScoped<IUsersRepository, UsersRepository>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

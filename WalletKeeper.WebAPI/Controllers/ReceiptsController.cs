@@ -68,9 +68,9 @@ namespace WalletKeeper.WebAPI.Controllers
 		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
 		public async Task<IActionResult> Delete(Int32 id)
 		{
-			return Ok(
-				await _mediator.Send(new DeleteReceiptCommand(id))
-			);
+			await _mediator.Send(new DeleteReceiptCommand(id));
+			
+			return NoContent();
 		}
 	}
 }
