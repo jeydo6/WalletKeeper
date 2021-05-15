@@ -42,7 +42,7 @@ namespace WalletKeeper.Application.Commands
 
 			var qrcode = QRCode.Parse(request.BarcodeString);
 
-			var receipt = await _repository.FindAsync(qrcode.FiscalDocumentNumber, cancellationToken);
+			var receipt = await _repository.FindAsync(qrcode.FiscalDriveNumber, cancellationToken);
 			if (receipt != null)
 			{
 				throw new BusinessException("Receipt already exists!");

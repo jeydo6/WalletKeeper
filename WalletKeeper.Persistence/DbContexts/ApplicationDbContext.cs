@@ -59,6 +59,50 @@ namespace WalletKeeper.Persistence.DbContexts
 
 			modelBuilder.Entity<IdentityRoleClaim<Guid>>()
 				.ToTable("RoleClaims");
+
+			modelBuilder.Entity<Category>()
+				.ToTable("Categories")
+				.HasKey(e => e.ID);
+
+			modelBuilder.Entity<Organization>()
+				.ToTable("Organizations")
+				.HasKey(e => e.ID);
+
+			modelBuilder.Entity<Organization>()
+				.HasIndex(e => e.INN)
+				.IsUnique(true);
+
+			modelBuilder.Entity<Product>()
+				.ToTable("Products")
+				.HasKey(e => e.ID);
+
+			modelBuilder.Entity<ProductItem>()
+				.ToTable("ProductItems")
+				.HasKey(e => e.ID);
+
+			modelBuilder.Entity<ProductItem>()
+				.Property(e => e.Price)
+				.HasPrecision(18, 2);
+
+			modelBuilder.Entity<ProductItem>()
+				.Property(e => e.Quantity)
+				.HasPrecision(18, 4);
+
+			modelBuilder.Entity<ProductItem>()
+				.Property(e => e.Sum)
+				.HasPrecision(18, 2);
+
+			modelBuilder.Entity<Receipt>()
+				.ToTable("Receipts")
+				.HasKey(e => e.ID);
+
+			modelBuilder.Entity<Receipt>()
+				.HasIndex(e => e.FiscalDriveNumber)
+				.IsUnique(true);
+
+			modelBuilder.Entity<Receipt>()
+				.Property(e => e.TotalSum)
+				.HasPrecision(18, 2);
 		}
 	}
 }

@@ -72,10 +72,19 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task DeleteAsync(Int32 id, CancellationToken cancellationToken = default)
 		{
-			var product = await _dbContext.Products.FindAsync(new Object[] { id }, cancellationToken);
+			var product = await _dbContext.Products
+				.Include(p => p.ProductItems)
+				.FirstOrDefaultAsync(p => p.ID == id, cancellationToken);
+
 			if (product == null)
 			{
 				throw new BusinessException("Product is not exists!");
+			}
+
+			foreach (var productItem in product.ProductItems)
+			{
+				productItem.ProductID = null;
+				productItem.Product = null;
 			}
 
 			_dbContext.Products.Remove(product);
