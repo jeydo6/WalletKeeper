@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using WalletKeeper.Domain.Exceptions;
 
-namespace WalletKeeper.Application.Extensions
+namespace WalletKeeper.Domain.Extensions
 {
 	public static class PrincipalExtension
 	{

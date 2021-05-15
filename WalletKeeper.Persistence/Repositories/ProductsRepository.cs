@@ -47,16 +47,10 @@ namespace WalletKeeper.Persistence.Repositories
 				throw new BusinessException("Product already exists!");
 			}
 
-			product = new Product
-			{
-				Name = item.Name,
-				CategoryID = item.CategoryID
-			};
-
-			await _dbContext.Products.AddAsync(product, cancellationToken);
+			await _dbContext.Products.AddAsync(item, cancellationToken);
 			await _dbContext.SaveChangesAsync(cancellationToken);
 
-			return product;
+			return item;
 		}
 
 		public async Task<Product> UpdateAsync(Int32 id, Product item, CancellationToken cancellationToken = default)

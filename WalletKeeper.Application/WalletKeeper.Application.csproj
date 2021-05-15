@@ -11,7 +11,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\WalletKeeper.Domain\WalletKeeper.Domain.csproj" />
-		<ProjectReference Include="..\WalletKeeper.Persistence\WalletKeeper.Persistence.csproj" />
 	</ItemGroup>
 
 </Project>

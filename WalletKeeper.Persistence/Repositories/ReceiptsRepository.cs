@@ -9,7 +9,6 @@ using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
 using WalletKeeper.Domain.Repositories;
 using WalletKeeper.Persistence.DbContexts;
-using WalletKeeper.Persistence.Extensions;
 
 namespace WalletKeeper.Persistence.Repositories
 {
@@ -31,13 +30,8 @@ namespace WalletKeeper.Persistence.Repositories
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<Receipt[]> GetAsync(CancellationToken cancellationToken = default)
+		public async Task<Receipt[]> GetAsync(Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var receipts = await _dbContext.Receipts
 				.Where(pi => pi.UserID == userID)
 				.ToArrayAsync(cancellationToken);
@@ -45,94 +39,48 @@ namespace WalletKeeper.Persistence.Repositories
 			return receipts;
 		}
 
-		public async Task<Receipt> GetAsync(Int32 id, CancellationToken cancellationToken = default)
+		public async Task<Receipt> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(pi => pi.ID == id && pi.UserID == userID, cancellationToken);
 
 			return receipt;
 		}
 
-		public async Task<Receipt> GetAsync(String fiscalDocumentNumber, CancellationToken cancellationToken = default)
+		public async Task<Receipt> FindAsync(String fiscalDocumentNumber, CancellationToken cancellationToken = default)
 		{
 			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.FiscalDocumentNumber == fiscalDocumentNumber, cancellationToken);
 
 			return receipt;
 		}
 
-		public async Task<Receipt> CreateAsync(Receipt item, CancellationToken cancellationToken = default)
+		public async Task<Receipt> CreateAsync(Receipt item, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
+			item.UserID = userID;
 
-			var receipt = new Receipt
+			var productItems = await _dbContext.ProductItems.Where(pi => pi.ProductID != null).ToListAsync(cancellationToken);
+			foreach (var productItem in item.ProductItems)
 			{
-				FiscalDocumentNumber = item.FiscalDocumentNumber,
-				FiscalDriveNumber = item.FiscalDriveNumber,
-				FiscalType = item.FiscalType,
-				DateTime = item.DateTime,
-				TotalSum = item.TotalSum,
-				OperationType = item.OperationType,
-				Place = item.Place,
-				UserID = userID
-			};
-
-			var productItems = await _dbContext.ProductItems.ToListAsync(cancellationToken);
-			receipt.ProductItems = item.ProductItems
-				.Select(pi =>
+				var temp = productItems.FirstOrDefault(pi => pi.Name == productItem.Name);
+				if (temp != null)
 				{
-					var result = new ProductItem
-					{
-						Name = pi.Name,
-						Price = pi.Price,
-						Quantity = pi.Quantity,
-						Sum = pi.Sum,
-						Receipt = receipt
-					};
-
-					var productItem = productItems.FirstOrDefault(pi => pi.Name == result.Name);
-					if (productItem != null)
-					{
-						result.ProductID = productItem.ProductID;
-					}
-
-					return result;
-				})
-				.ToList();
+					productItem.ProductID = temp.ProductID;
+				}
+			}
 
 			var organization = await _dbContext.Organizations.FirstOrDefaultAsync(o => o.INN == item.Organization.INN, cancellationToken);
 			if (organization != null)
 			{
-				receipt.OrganizationID = organization.ID;
-			}
-			else
-			{
-				receipt.Organization = new Organization
-				{
-					INN = item.Organization.INN,
-					Name = item.Organization.Name
-				};
+				item.OrganizationID = organization.ID;
 			}
 
-			await _dbContext.Receipts.AddAsync(receipt, cancellationToken);
+			await _dbContext.Receipts.AddAsync(item, cancellationToken);
 			await _dbContext.SaveChangesAsync(cancellationToken);
 
-			return receipt;
+			return item;
 		}
 
-		public async Task DeleteAsync(Int32 id, CancellationToken cancellationToken = default)
+		public async Task DeleteAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(pi => pi.ID == id && pi.UserID == userID, cancellationToken);
 			if (receipt == null)
 			{

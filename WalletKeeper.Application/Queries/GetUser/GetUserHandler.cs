@@ -1,39 +1,37 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Application.Extensions;
-using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.Domain.Extensions;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
 {
 	public class GetUserHandler : IRequestHandler<GetUserQuery, UserDto>
 	{
-		private readonly UserManager<User> _userManager;
-
 		private readonly IPrincipal _principal;
+		private readonly IUsersRepository _usersRepository;
 		private readonly ILogger<GetUserHandler> _logger;
 
 		public GetUserHandler(
-			UserManager<User> userManager,
 			IPrincipal principal,
+			IUsersRepository usersRepository,
 			ILogger<GetUserHandler> logger
 		)
 		{
-			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
+			_usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public async Task<UserDto> Handle(GetUserQuery request, CancellationToken cancellationToken)
 		{
 			var userID = _principal.GetUserID();
-			var user = await _userManager.FindByIdAsync(userID);
+			var user = await _usersRepository.GetAsync(userID);
 			if (user == null)
 			{
 				throw new BusinessException("User is not exists!");

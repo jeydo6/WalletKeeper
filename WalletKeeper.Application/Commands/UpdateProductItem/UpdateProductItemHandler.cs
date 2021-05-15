@@ -1,25 +1,30 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.Domain.Extensions;
 using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class UpdateProductItemHandler : IRequestHandler<UpdateProductItemCommand, ProductItemDto>
 	{
+		private readonly IPrincipal _principal;
 		private readonly IProductItemsRepository _repository;
 		private readonly ILogger<UpdateProductItemHandler> _logger;
 
 		public UpdateProductItemHandler(
+			IPrincipal principal,
 			IProductItemsRepository repository,
 			ILogger<UpdateProductItemHandler> logger
 		)
 		{
+			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 			_repository = repository ?? throw new ArgumentNullException(nameof(repository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
@@ -36,6 +41,11 @@ namespace WalletKeeper.Application.Commands
 				throw new ValidationException($"{nameof(request.Dto)} is invalid");
 			}
 
+			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
+			{
+				throw new BusinessException($"{nameof(userID)} is invalid");
+			}
+
 			var item = new ProductItem
 			{
 				ID = request.Dto.ID,
@@ -47,7 +57,7 @@ namespace WalletKeeper.Application.Commands
 				ReceiptID = request.Dto.ReceiptID
 			};
 
-			var productItem = await _repository.UpdateAsync(request.ID, item, cancellationToken);
+			var productItem = await _repository.UpdateAsync(request.ID, item, userID, cancellationToken);
 
 			var result = new ProductItemDto
 			{

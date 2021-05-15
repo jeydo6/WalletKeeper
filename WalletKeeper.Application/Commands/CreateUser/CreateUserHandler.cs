@@ -1,28 +1,26 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Dto;
-using WalletKeeper.Application.Extensions;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class CreateUserHandler : IRequestHandler<CreateUserCommand, UserDto>
 	{
-		private readonly UserManager<User> _userManager;
-
+		private readonly IUsersRepository _usersRepository;
 		private readonly ILogger<CreateUserHandler> _logger;
 
 		public CreateUserHandler(
-			UserManager<User> userManager,
+			IUsersRepository usersRepository,
 			ILogger<CreateUserHandler> logger
 		)
 		{
-			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+			_usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -50,8 +48,7 @@ namespace WalletKeeper.Application.Commands
 				EmailConfirmed = false
 			};
 
-			var identityResult = await _userManager.CreateAsync(user, request.Dto.Password);
-			identityResult.EnsureSuccess("An error occurred while creating a user", _logger);
+			user = await _usersRepository.CreateAsync(user, request.Dto.Password);
 
 			var result = new UserDto
 			{
