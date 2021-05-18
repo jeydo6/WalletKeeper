@@ -20,6 +20,7 @@ using WalletKeeper.Barcodes.Decoders;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
+using WalletKeeper.Domain.Providers;
 using WalletKeeper.Domain.Repositories;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Infrastructure.Services;
@@ -131,6 +132,9 @@ namespace WalletKeeper.WebAPI
 
 			services
 				.AddSingleton<IEmailService, EmailService>();
+
+			services
+				.AddSingleton<IDateTimeProvider, CurrentDateTimeProvider>();
 
 			services
 				.AddScoped<IPrincipal, ClaimsPrincipal>(sp =>
