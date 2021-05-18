@@ -23,7 +23,7 @@ namespace WalletKeeper.Demo.DataContexts
 			Receipts = new List<Receipt>();
 			Users = new List<User>();
 			Roles = new List<Role>();
-			UserRoles = new List<Tuple<Guid, Guid>>();
+			UserRoles = new List<(Guid UserId, Guid RoleId)>();
 
 			Seed();
 		}
@@ -42,7 +42,7 @@ namespace WalletKeeper.Demo.DataContexts
 
 		public List<Role> Roles { get; }
 
-		internal List<Tuple<Guid, Guid>> UserRoles { get; }
+		internal List<(Guid UserId, Guid RoleId)> UserRoles { get; }
 
 		private void Seed()
 		{
@@ -71,7 +71,7 @@ namespace WalletKeeper.Demo.DataContexts
 			};
 			Users.Add(user);
 
-			var userRole = new Tuple<Guid, Guid>(user.Id, role.Id);
+			var userRole = (user.Id, role.Id);
 			UserRoles.Add(userRole);
 
 			var organization = new Organization
@@ -125,7 +125,7 @@ namespace WalletKeeper.Demo.DataContexts
 
 			var category2 = new Category
 			{
-				ID = 1,
+				ID = 2,
 				Name = "Фрукты",
 				Products = new List<Product>
 				{
@@ -164,15 +164,36 @@ namespace WalletKeeper.Demo.DataContexts
 			Categories.Add(category2);
 			Products.AddRange(category2.Products);
 
+			var category3 = new Category
+			{
+				ID = 3,
+				Name = "Пожертвования",
+				Products = new List<Product>
+				{
+					new Product
+					{
+						ID = 11,
+						Name = "На кофе разработчику"
+					}
+				}
+			};
+			foreach (var product in category3.Products)
+			{
+				product.CategoryID = category3.ID;
+				product.Category = category3;
+			}
+			Categories.Add(category3);
+			Products.AddRange(category3.Products);
+
 			var receipt = new Receipt
 			{
 				ID = 1,
-				DateTime = _dateTimeProvider.Now.AddDays(-1),
 				FiscalDocumentNumber = "123456",
 				FiscalDriveNumber = "1234567812345678",
 				FiscalType = "1234",
+				DateTime = _dateTimeProvider.Now.AddDays(-1),
 				OperationType = 1,
-				Place = "Торговый центр № 1",
+				Place = "Место совершения покупки",
 				OrganizationID = organization.ID,
 				Organization = organization,
 				UserID = user.Id,

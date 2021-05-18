@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -18,13 +19,17 @@ namespace WalletKeeper.Infrastructure.Services
 		private readonly HttpClient _httpClient;
 		private readonly FiscalDataServiceConfig _config;
 
+		private readonly ILogger<FiscalDataService> _logger;
+
 		public FiscalDataService(
 			HttpClient httpClient,
-			IOptions<FiscalDataServiceConfig> configOptions
+			IOptions<FiscalDataServiceConfig> configOptions,
+			ILogger<FiscalDataService> logger
 		)
 		{
 			_httpClient = httpClient;
 			_config = configOptions.Value;
+			_logger = logger;
 		}
 
 		public async Task<Receipt> GetReceipt(QRCode qrcode)
@@ -79,11 +84,11 @@ namespace WalletKeeper.Infrastructure.Services
 				};
 
 				receipt.ProductItems = jObject["items"]
-					.GroupBy(jt => jt.Value<String>("name"))
+					.GroupBy(jt => new { Name = jt.Value<String>("name"), Price = jt.Value<Decimal>("price") / 100 })
 					.Select(g => new ProductItem
 					{
-						Name = g.Key,
-						Price = g.Sum(jt => jt.Value<Decimal>("price")) / 100,
+						Name = g.Key.Name,
+						Price = g.Key.Price,
 						Quantity = g.Sum(jt => jt.Value<Decimal>("quantity")),
 						Sum = g.Sum(jt => jt.Value<Decimal>("sum")) / 100,
 						Receipt = receipt
