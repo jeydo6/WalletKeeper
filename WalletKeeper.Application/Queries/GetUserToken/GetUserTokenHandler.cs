@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.Domain.Providers;
 using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
@@ -20,19 +21,21 @@ namespace WalletKeeper.Application.Queries
 		private readonly AuthenticationConfig _authenticationConfig;
 
 		private readonly IUsersRepository _usersRepository;
+		private readonly IDateTimeProvider _dateTimeProvider;
 		private readonly IUserClaimsPrincipalFactory<User> _claimsPrincipalFactory;
 		private readonly ILogger<GetUserTokenHandler> _logger;
 
 		public GetUserTokenHandler(
-			UserManager<User> userManager,
 			IOptionsSnapshot<AuthenticationConfig> authenticationConfigOptions,
 			IUsersRepository usersRepository,
+			IDateTimeProvider dateTimeProvider,
 			IUserClaimsPrincipalFactory<User> claimsPrincipalFactory,
 			ILogger<GetUserTokenHandler> logger
 		)
 		{
 			_authenticationConfig = authenticationConfigOptions != null ? authenticationConfigOptions.Value : throw new ArgumentNullException(nameof(authenticationConfigOptions));
 			_usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
+			_dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
 			_claimsPrincipalFactory = claimsPrincipalFactory ?? throw new ArgumentNullException(nameof(claimsPrincipalFactory));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
@@ -67,8 +70,8 @@ namespace WalletKeeper.Application.Queries
 
 			var jwt = new JwtSecurityToken(
 				issuer: _authenticationConfig.Issuer,
-				notBefore: DateTime.UtcNow,
-				expires: DateTime.UtcNow.AddDays(14),
+				notBefore: _dateTimeProvider.UtcNow,
+				expires: _dateTimeProvider.UtcNow.AddDays(14),
 				claims: identity.Claims,
 				signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
 			);

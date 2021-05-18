@@ -11,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -37,10 +36,6 @@ namespace WalletKeeper.WebAPI
 		public Startup(IConfiguration configuration)
 		{
 			Configuration = configuration;
-
-			Log.Logger = new LoggerConfiguration()
-				.ReadFrom.Configuration(Configuration)
-				.CreateLogger();
 		}
 
 		public IConfiguration Configuration { get; }
@@ -60,14 +55,7 @@ namespace WalletKeeper.WebAPI
 				.AddOptions();
 
 			services
-				.Configure<AuthenticationConfig>(Configuration.GetSection($"{nameof(AuthenticationConfig)}"))
-				.Configure<FiscalDataServiceConfig>(Configuration.GetSection($"{nameof(FiscalDataServiceConfig)}"))
-				.Configure<SmtpConfig>(Configuration.GetSection($"{nameof(SmtpConfig)}"));
-
-			services
-				.AddDbContext<ApplicationDbContext>(options =>
-					options.UseSqlServer(Configuration.GetConnectionString("DbConnection"))
-				);
+				.AddMediatR(typeof(Application.AssemblyMarker));
 
 			services
 				.AddSwaggerGen(options =>
@@ -111,7 +99,14 @@ namespace WalletKeeper.WebAPI
 				});
 
 			services
-				.AddMediatR(typeof(Application.AssemblyMarker));
+				.Configure<AuthenticationConfig>(Configuration.GetSection($"{nameof(AuthenticationConfig)}"))
+				.Configure<FiscalDataServiceConfig>(Configuration.GetSection($"{nameof(FiscalDataServiceConfig)}"))
+				.Configure<SmtpConfig>(Configuration.GetSection($"{nameof(SmtpConfig)}"));
+
+			services
+				.AddDbContext<ApplicationDbContext>(options =>
+					options.UseSqlServer(Configuration.GetConnectionString("DbConnection"))
+				);
 
 			services
 				.AddAuthentication(options =>
@@ -136,6 +131,15 @@ namespace WalletKeeper.WebAPI
 
 			services
 				.AddSingleton<IEmailService, EmailService>();
+
+			services
+				.AddScoped<IPrincipal, ClaimsPrincipal>(sp =>
+				{
+					var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
+
+					return httpContextAccessor.HttpContext.User;
+				})
+				.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory>();
 
 			services
 				.AddScoped<ICategoriesRepository, CategoriesRepository>()
@@ -217,15 +221,6 @@ namespace WalletKeeper.WebAPI
 				})
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
-
-			services
-				.AddScoped<IPrincipal, ClaimsPrincipal>(sp =>
-				{
-					var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
-
-					return httpContextAccessor.HttpContext.User;
-				})
-				.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory>();
 
 			services
 				.AddAuthentication(options =>

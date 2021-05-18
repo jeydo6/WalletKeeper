@@ -21,8 +21,11 @@ namespace WalletKeeper.WebAPI
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder
-						.UseStartup<Startup>()
-						.UseSerilog();
+						.UseSerilog((context, logger) =>
+						{
+							logger.ReadFrom.Configuration(context.Configuration);
+						})
+						.UseStartup<Startup>();
 				});
 		}
 	}
