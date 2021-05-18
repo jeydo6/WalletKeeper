@@ -17,6 +17,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using WalletKeeper.Barcodes.Decoders;
+using WalletKeeper.Demo.DataContexts;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
@@ -43,6 +44,8 @@ namespace WalletKeeper.WebAPI
 
 		public void ConfigureServices(IServiceCollection services)
 		{
+			var test = new ApplicationDataContext(new CurrentDateTimeProvider());
+
 			services
 				.AddControllers(options =>
 				{
