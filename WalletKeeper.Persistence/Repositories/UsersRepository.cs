@@ -43,6 +43,9 @@ namespace WalletKeeper.Persistence.Repositories
 			var result = await _userManager.CreateAsync(item, password);
 			result.EnsureSuccess("An error occurred while creating a user", _logger);
 
+			result = await _userManager.AddToRoleAsync(item, "User");
+			result.EnsureSuccess("An error occurred while creating a user", _logger);
+
 			return item;
 		}
 
