@@ -26,7 +26,6 @@ using WalletKeeper.Domain.Repositories;
 using WalletKeeper.Domain.Services;
 using WalletKeeper.Infrastructure.Services;
 using WalletKeeper.Persistence.DbContexts;
-using WalletKeeper.Persistence.Factories;
 using WalletKeeper.Persistence.Repositories;
 using WalletKeeper.WebAPI.Filters;
 using WalletKeeper.WebAPI.Options;
@@ -145,8 +144,8 @@ namespace WalletKeeper.WebAPI
 					var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
 
 					return httpContextAccessor.HttpContext.User;
-				})
-				.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory>();
+				});
+				//.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User, Role>>();
 
 			services
 				.AddScoped<ICategoriesRepository, CategoriesRepository>()
