@@ -3,7 +3,7 @@ using WalletKeeper.Domain.Configs;
 
 namespace WalletKeeper.WebAPI.Options
 {
-	internal class ConfigureLiveOptions
+	internal class LiveServicesOptions
 	{
 		public String ConnectionString { get; set; }
 

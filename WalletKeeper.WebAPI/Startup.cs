@@ -17,16 +17,12 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using WalletKeeper.Barcodes.Decoders;
-using WalletKeeper.Demo.DataContexts;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
 using WalletKeeper.Domain.Providers;
 using WalletKeeper.Domain.Repositories;
 using WalletKeeper.Domain.Services;
-using WalletKeeper.Infrastructure.Services;
-using WalletKeeper.Persistence.DbContexts;
-using WalletKeeper.Persistence.Repositories;
 using WalletKeeper.WebAPI.Filters;
 using WalletKeeper.WebAPI.Options;
 
@@ -43,8 +39,6 @@ namespace WalletKeeper.WebAPI
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			var test = new ApplicationDataContext(new CurrentDateTimeProvider());
-
 			services
 				.AddControllers(options =>
 				{
@@ -107,52 +101,63 @@ namespace WalletKeeper.WebAPI
 				.Configure<SmtpConfig>(Configuration.GetSection($"{nameof(SmtpConfig)}"));
 
 			services
-				.AddDbContext<ApplicationDbContext>(options =>
-					options.UseSqlServer(Configuration.GetConnectionString("DbConnection"))
-				);
+				.AddSingleton<MagickQRCodeDecoder>()
+				.AddSingleton<EmailMessageFactory>();
 
+			#region ConfigureServices
+#if DEMO
 			services
-				.AddAuthentication(options =>
+				.ConfigureDemoServices();
+#elif DEBUG
+			services
+				.ConfigureLiveServices(options =>
 				{
+					options.ConnectionString = Configuration
+						.GetConnectionString("DbConnection");
+
 					options.AuthenticationConfig = Configuration
 						.GetSection($"{nameof(AuthenticationConfig)}")
 						.Get<AuthenticationConfig>();
 				});
-
+#elif RELEASE
 			services
-				.AddHttpClient<IFiscalDataService, FiscalDataService>((sp, httpClient) =>
+				.ConfigureLiveServices(options =>
 				{
-					var configOptions = sp.GetRequiredService<IOptions<FiscalDataServiceConfig>>();
-					var config = configOptions.Value;
+					options.ConnectionString = Configuration
+						.GetConnectionString("DbConnection");
 
-					httpClient.BaseAddress = new Uri(config.Address);
+					options.AuthenticationConfig = Configuration
+						.GetSection($"{nameof(AuthenticationConfig)}")
+						.Get<AuthenticationConfig>();
 				});
+#else
+			throw new Exception("Unknown project configuration!");
+#endif
+			#endregion
 
 			services
-				.AddSingleton<MagickQRCodeDecoder>()
-				.AddSingleton<EmailMessageFactory>();
-
-			services
-				.AddSingleton<IEmailService, EmailService>();
-
-			services
-				.AddSingleton<IDateTimeProvider, CurrentDateTimeProvider>();
-
-			services
-				.AddScoped<IPrincipal, ClaimsPrincipal>(sp =>
+				.AddAuthentication(options =>
 				{
-					var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
+					options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+					options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+				})
+				.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+				{
+					var authenticationConfig = Configuration
+						.GetSection($"{nameof(AuthenticationConfig)}")
+						.Get<AuthenticationConfig>();
 
-					return httpContextAccessor.HttpContext.User;
+					options.RequireHttpsMetadata = true;
+					options.TokenValidationParameters = new TokenValidationParameters
+					{
+						ValidateIssuer = true,
+						ValidIssuer = authenticationConfig.Issuer,
+						ValidateAudience = false,
+						ValidateLifetime = true,
+						ValidateIssuerSigningKey = true,
+						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationConfig.Secret))
+					};
 				});
-				//.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User, Role>>();
-
-			services
-				.AddScoped<ICategoriesRepository, CategoriesRepository>()
-				.AddScoped<IProductsRepository, ProductsRepository>()
-				.AddScoped<IProductItemsRepository, ProductItemsRepository>()
-				.AddScoped<IReceiptsRepository, ReceiptsRepository>()
-				.AddScoped<IUsersRepository, UsersRepository>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -191,12 +196,15 @@ namespace WalletKeeper.WebAPI
 
 	internal static class StartupExtension
 	{
-		public static void AddAuthentication(this IServiceCollection services, Action<AuthenticationOptions> configureOptions)
+		public static void ConfigureLiveServices(this IServiceCollection services, Action<LiveServicesOptions> configureOptions)
 		{
-			var options = new AuthenticationOptions();
-			configureOptions(options);
+			var liveOptions = new LiveServicesOptions();
+			configureOptions(liveOptions);
 
-			var config = options.AuthenticationConfig;
+			services
+				.AddDbContext<Persistence.DbContexts.ApplicationDbContext>(options =>
+					options.UseSqlServer(liveOptions.ConnectionString)
+				);
 
 			services
 				.AddIdentity<User, Role>(options =>
@@ -225,28 +233,69 @@ namespace WalletKeeper.WebAPI
 						DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5)
 					};
 				})
-				.AddEntityFrameworkStores<ApplicationDbContext>()
+				.AddEntityFrameworkStores<Persistence.DbContexts.ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 
 			services
-				.AddAuthentication(options =>
+				.AddHttpClient<IFiscalDataService, Infrastructure.Services.FiscalDataService>((sp, httpClient) =>
 				{
-					options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-					options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-				})
-				.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-				{
-					options.RequireHttpsMetadata = true;
-					options.TokenValidationParameters = new TokenValidationParameters
-					{
-						ValidateIssuer = true,
-						ValidIssuer = config.Issuer,
-						ValidateAudience = false,
-						ValidateLifetime = true,
-						ValidateIssuerSigningKey = true,
-						IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Secret))
-					};
+					var configOptions = sp.GetRequiredService<IOptions<FiscalDataServiceConfig>>();
+					var config = configOptions.Value;
+
+					httpClient.BaseAddress = new Uri(config.Address);
 				});
+
+			services
+				.AddSingleton<IEmailService, Infrastructure.Services.EmailService>();
+
+			services
+				.AddSingleton<IDateTimeProvider, CurrentDateTimeProvider>();
+
+			services
+				.AddScoped<IPrincipal, ClaimsPrincipal>(sp =>
+				{
+					var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
+
+					return httpContextAccessor.HttpContext.User;
+				});
+
+			services
+				.AddScoped<ICategoriesRepository, Persistence.Repositories.CategoriesRepository>()
+				.AddScoped<IProductsRepository, Persistence.Repositories.ProductsRepository>()
+				.AddScoped<IProductItemsRepository, Persistence.Repositories.ProductItemsRepository>()
+				.AddScoped<IReceiptsRepository, Persistence.Repositories.ReceiptsRepository>()
+				.AddScoped<IUsersRepository, Persistence.Repositories.UsersRepository>();
 		}
+
+		public static void ConfigureDemoServices(this IServiceCollection services)
+		{
+			services
+				.AddSingleton<IEmailService, Demo.Services.EmailService>()
+				.AddSingleton<IFiscalDataService, Demo.Services.FiscalDataService>();
+
+			services
+				.AddSingleton<IDateTimeProvider, CurrentDateTimeProvider>();
+
+			services
+				.AddHttpContextAccessor()
+				.AddScoped<IPrincipal, ClaimsPrincipal>(sp =>
+				{
+					var httpContextAccessor = sp.GetService<IHttpContextAccessor>();
+
+					return httpContextAccessor.HttpContext.User;
+				})
+				.AddScoped<IUserClaimsPrincipalFactory<User>, Demo.Factories.UserClaimsPrincipalFactory>();
+
+			services
+				.AddSingleton<Demo.DataContexts.ApplicationDataContext>();
+
+			services
+				.AddScoped<ICategoriesRepository, Demo.Repositories.CategoriesRepository>()
+				.AddScoped<IProductsRepository, Demo.Repositories.ProductsRepository>()
+				.AddScoped<IProductItemsRepository, Demo.Repositories.ProductItemsRepository>()
+				.AddScoped<IReceiptsRepository, Demo.Repositories.ReceiptsRepository>()
+				.AddScoped<IUsersRepository, Demo.Repositories.UsersRepository>();
+		}
+
 	}
 }
