@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using WalletKeeper.Demo.DataContexts;
@@ -14,6 +15,10 @@ namespace WalletKeeper.Demo.Services
 	public class FiscalDataService : IFiscalDataService
 	{
 		private static readonly Random Random = new(0);
+		private static readonly NumberFormatInfo DotDecimalSeparator = new()
+		{
+			NumberDecimalSeparator = "."
+		};
 
 		private readonly ApplicationDataContext _dataContext;
 
@@ -39,8 +44,8 @@ namespace WalletKeeper.Demo.Services
 				FiscalDocumentNumber = qrcode.FiscalDocumentNumber,
 				FiscalDriveNumber = qrcode.FiscalDriveNumber,
 				FiscalType = qrcode.FiscalType,
-				DateTime = DateTime.TryParse(qrcode.DateTime, out var dateTime) ? dateTime : _dateTimeProvider.Now.AddDays(-1),
-				TotalSum = Decimal.TryParse(qrcode.TotalSum, out var totalSum) ? totalSum : 0,
+				DateTime = DateTime.TryParseExact(qrcode.DateTime, "yyyyMMddTHHmm", CultureInfo.CurrentCulture, DateTimeStyles.None, out var dateTime) ? dateTime : _dateTimeProvider.Now.AddDays(-1),
+				TotalSum = Decimal.TryParse(qrcode.TotalSum, NumberStyles.Float, DotDecimalSeparator, out var totalSum) ? totalSum : 0,
 				OperationType = 1,
 				Place = "Место совершения покупки",
 				OrganizationID = organization.ID,
@@ -59,36 +64,42 @@ namespace WalletKeeper.Demo.Services
 			
 			var result = new List<ProductItem>();
 
-			var resultSum = 0;
+			var resultSum = 0.00m;
 			foreach (var productItem in productItems)
 			{
-				var daysMultiplier = 0.001m;
-				var daysCount = (Decimal)(receipt.DateTime - productItem.Receipt.DateTime).TotalDays;
-				var price = daysCount > 0 ? productItem.Price * daysCount * (1 + daysMultiplier) : productItem.Price;
-				var sum = productItem.Quantity * price;
+				var daysMultiplier = 0.0005;
+				var daysCount = (receipt.DateTime - productItem.Receipt.DateTime).TotalDays;
 
-				if (resultSum + sum <= receipt.TotalSum)
-				{
-					result.Add(new ProductItem
-					{
-						Name = productItem.Name,
-						Price = price,
-						Quantity = productItem.Quantity,
-						Sum = sum
-					});
-				}
-				else
-				{
-					result.Add(new ProductItem
-					{
-						Name = "На кофе разработчику",
-						Price = receipt.TotalSum - resultSum,
-						Quantity = 1.00m,
-						Sum = receipt.TotalSum - resultSum
-					});
+				var priceMultiplier = daysCount > 0 ? (Decimal)Math.Pow(1 + daysMultiplier, daysCount) : 1;
 
+				var price = Math.Round(productItem.Price * priceMultiplier, 2);
+				var sum = Math.Round(productItem.Quantity * price, 2);
+
+				if (resultSum + sum > receipt.TotalSum)
+				{
 					break;
 				}
+
+				result.Add(new ProductItem
+				{
+					Name = productItem.Name,
+					Price = price,
+					Quantity = productItem.Quantity,
+					Sum = sum
+				});
+
+				resultSum += sum;
+			}
+
+			if (resultSum < receipt.TotalSum)
+			{
+				result.Add(new ProductItem
+				{
+					Name = "На кофе разработчику",
+					Price = receipt.TotalSum - resultSum,
+					Quantity = 1.0000m,
+					Sum = receipt.TotalSum - resultSum
+				});
 			}
 
 			return result
