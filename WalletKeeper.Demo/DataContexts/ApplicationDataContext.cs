@@ -191,7 +191,7 @@ namespace WalletKeeper.Demo.DataContexts
 				FiscalDocumentNumber = "123456",
 				FiscalDriveNumber = "1234567812345678",
 				FiscalType = "1234",
-				DateTime = _dateTimeProvider.Now.AddDays(-1),
+				DateTime = _dateTimeProvider.Now.AddDays(-14),
 				OperationType = 1,
 				Place = "Место совершения покупки",
 				OrganizationID = organization.ID,

@@ -82,6 +82,8 @@ namespace WalletKeeper.Demo.Repositories
 			{
 				productItem.ID = _dataContext.ProductItems.Max(pi => pi.ID) + 1;
 				productItem.ReceiptID = item.ID;
+
+				_dataContext.ProductItems.Add(productItem);
 			}
 			_dataContext.Receipts.Add(item);
 
