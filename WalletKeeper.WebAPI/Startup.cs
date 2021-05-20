@@ -174,6 +174,7 @@ namespace WalletKeeper.WebAPI
 			);
 
 			app.UseHttpsRedirection();
+			app.UseStaticFiles();
 
 			app.UseRouting();
 
@@ -188,7 +189,6 @@ namespace WalletKeeper.WebAPI
 			app.UseSwagger();
 			app.UseSwaggerUI(options =>
 			{
-				options.RoutePrefix = "";
 				options.SwaggerEndpoint("/swagger/main/swagger.json", "WalletKeeperAPI");
 			});
 		}
