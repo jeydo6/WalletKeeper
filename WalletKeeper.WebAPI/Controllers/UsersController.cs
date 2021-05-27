@@ -12,7 +12,7 @@ namespace WalletKeeper.WebAPI.Controllers
 {
 	[Authorize]
 	[ApiController]
-	[Route("users")]
+	[Route("api/users")]
 	public class UsersController : ControllerBase
 	{
 		private readonly IMediator _mediator;

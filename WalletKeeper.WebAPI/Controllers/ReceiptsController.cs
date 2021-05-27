@@ -12,7 +12,7 @@ namespace WalletKeeper.WebAPI.Controllers
 {
 	[Authorize]
 	[ApiController]
-	[Route("receipts")]
+	[Route("api/receipts")]
 	public class ReceiptsController : ControllerBase
 	{
 		private readonly IMediator _mediator;
@@ -69,7 +69,7 @@ namespace WalletKeeper.WebAPI.Controllers
 		public async Task<IActionResult> Delete(Int32 id)
 		{
 			await _mediator.Send(new DeleteReceiptCommand(id));
-			
+
 			return NoContent();
 		}
 	}

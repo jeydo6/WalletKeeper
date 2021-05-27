@@ -49,6 +49,12 @@ namespace WalletKeeper.WebAPI
 				.AddNewtonsoftJson();
 
 			services
+				.AddSpaStaticFiles(options =>
+				{
+					options.RootPath = "wwwroot";
+				});
+
+			services
 				.AddOptions();
 
 			services
@@ -162,11 +168,6 @@ namespace WalletKeeper.WebAPI
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-
 			app.UseCors(builder => builder
 				.AllowAnyHeader()
 				.AllowAnyMethod()
@@ -189,8 +190,25 @@ namespace WalletKeeper.WebAPI
 			app.UseSwagger();
 			app.UseSwaggerUI(options =>
 			{
+				options.RoutePrefix = "api/swagger";
 				options.SwaggerEndpoint("/swagger/main/swagger.json", "WalletKeeperAPI");
 			});
+
+			if (env.IsDevelopment())
+			{
+				app.UseSpa(spa =>
+				{
+					spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+				});
+			}
+			else
+			{
+				app.UseSpaStaticFiles();
+				app.UseSpa(spa =>
+				{
+					spa.Options.SourcePath = "wwwroot";
+				});
+			}
 		}
 	}
 

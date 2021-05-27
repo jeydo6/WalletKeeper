@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Net;
 using System.Threading.Tasks;
 using WalletKeeper.Application.Commands;
 using WalletKeeper.Application.Dto;
@@ -12,7 +11,7 @@ namespace WalletKeeper.WebAPI.Controllers
 {
 	[Authorize]
 	[ApiController]
-	[Route("productItems")]
+	[Route("api/productItems")]
 	public class ProductItemsController : ControllerBase
 	{
 		private readonly IMediator _mediator;
