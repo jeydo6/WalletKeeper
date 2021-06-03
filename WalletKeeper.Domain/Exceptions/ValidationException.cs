@@ -4,6 +4,9 @@ using System.Runtime.Serialization;
 namespace WalletKeeper.Domain.Exceptions
 {
 
+	/// <summary>
+	/// Ошибки валидации
+	/// </summary>
 	[Serializable]
 	public class ValidationException : Exception
 	{
