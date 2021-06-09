@@ -25,19 +25,10 @@ namespace WalletKeeper.WebAPI.Controllers
 		[AllowAnonymous]
 		[HttpPost]
 		[Produces(typeof(String))]
-		public async Task<IActionResult> GetToken(LoginDto dto)
+		public async Task<IActionResult> GetUserToken(LoginDto dto)
 		{
 			return Ok(
 				await _mediator.Send(new GetUserTokenQuery(dto))
-			);
-		}
-
-		[HttpGet]
-		[Produces(typeof(UserInfoDto))]
-		public async Task<IActionResult> GetUserInfo()
-		{
-			return Ok(
-				await _mediator.Send(new GetUserInfoQuery())
 			);
 		}
 	}

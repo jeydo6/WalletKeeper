@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WalletKeeper.Application.Dto;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
@@ -16,7 +17,7 @@ using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetUserTokenHandler : IRequestHandler<GetUserTokenQuery, String>
+	public class GetUserTokenHandler : IRequestHandler<GetUserTokenQuery, GenericDto<String>>
 	{
 		private readonly AuthenticationConfig _authenticationConfig;
 
@@ -40,7 +41,7 @@ namespace WalletKeeper.Application.Queries
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<String> Handle(GetUserTokenQuery request, CancellationToken cancellationToken)
+		public async Task<GenericDto<String>> Handle(GetUserTokenQuery request, CancellationToken cancellationToken)
 		{
 			if (String.IsNullOrWhiteSpace(request.Dto.UserName))
 			{
@@ -79,7 +80,10 @@ namespace WalletKeeper.Application.Queries
 			var result = new JwtSecurityTokenHandler()
 					.WriteToken(jwt);
 
-			return result;
+			return new GenericDto<String>
+			{
+				Value = result
+			};
 		}
 	}
 }
