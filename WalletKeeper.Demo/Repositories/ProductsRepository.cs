@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Demo.DataContexts;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
+using WalletKeeper.Domain.Extensions;
 using WalletKeeper.Domain.Repositories;
 
 namespace WalletKeeper.Demo.Repositories
@@ -14,38 +16,62 @@ namespace WalletKeeper.Demo.Repositories
 	{
 		private readonly ApplicationDataContext _dataContext;
 
+		private readonly IPrincipal _principal;
 		private readonly ILogger<ProductsRepository> _logger;
 
 		public ProductsRepository(
 			ApplicationDataContext dataContext,
+			IPrincipal principal,
 			ILogger<ProductsRepository> logger
 		)
 		{
+			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 			_dataContext = dataContext ?? throw new ArgumentNullException(nameof(dataContext));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public async Task<Product[]> GetAsync(CancellationToken cancellationToken = default)
 		{
-			var products = _dataContext.Products.ToArray();
+			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
+			{
+				throw new BusinessException($"{nameof(userID)} is invalid");
+			}
+
+			var products = _dataContext.Products
+				.Where(p => p.UserID == userID)
+				.ToArray();
 
 			return await Task.FromResult(products);
 		}
 
 		public async Task<Product> GetAsync(Int32 id, CancellationToken cancellationToken = default)
 		{
-			var product = _dataContext.Products.FirstOrDefault(c => c.ID == id);
+			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
+			{
+				throw new BusinessException($"{nameof(userID)} is invalid");
+			}
+
+			var product = _dataContext.Products.FirstOrDefault(p => p.ID == id && p.UserID == userID);
 
 			return await Task.FromResult(product);
 		}
 
 		public async Task<Product> CreateAsync(Product item, CancellationToken cancellationToken = default)
 		{
-			var product = _dataContext.Products.FirstOrDefault(c => c.Name == item.Name);
+			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
+			{
+				throw new BusinessException($"{nameof(userID)} is invalid");
+			}
+
+			var product = _dataContext.Products.FirstOrDefault(p => p.Name == item.Name && p.UserID == userID);
 			if (product != null)
 			{
 				throw new BusinessException("Product already exists!");
 			}
+
+			item.UserID = userID;
+			item.User = _dataContext.Users.FirstOrDefault(u => u.Id == userID) ?? throw new BusinessException("User is not exists!");
+			item.User.Products.Add(item);
 
 			var category = _dataContext.Categories.FirstOrDefault(c => c.ID == item.CategoryID);
 			if (category != null)
@@ -62,7 +88,12 @@ namespace WalletKeeper.Demo.Repositories
 
 		public async Task<Product> UpdateAsync(Int32 id, Product item, CancellationToken cancellationToken = default)
 		{
-			var product = _dataContext.Products.FirstOrDefault(c => c.ID == id);
+			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
+			{
+				throw new BusinessException($"{nameof(userID)} is invalid");
+			}
+
+			var product = _dataContext.Products.FirstOrDefault(p => p.Name == item.Name && p.UserID == userID);
 			if (product == null)
 			{
 				throw new BusinessException("Product is not exists!");
@@ -82,7 +113,12 @@ namespace WalletKeeper.Demo.Repositories
 
 		public async Task DeleteAsync(Int32 id, CancellationToken cancellationToken = default)
 		{
-			var product = _dataContext.Products.FirstOrDefault(p => p.ID == id);
+			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
+			{
+				throw new BusinessException($"{nameof(userID)} is invalid");
+			}
+
+			var product = _dataContext.Products.FirstOrDefault(p => p.ID == id && p.UserID == userID);
 			if (product == null)
 			{
 				throw new BusinessException("Product is not exists!");
@@ -94,6 +130,7 @@ namespace WalletKeeper.Demo.Repositories
 				productItem.Product = null;
 			}
 
+			product.User.Products.Remove(product);
 			_dataContext.Products.Remove(product);
 
 			await Task.CompletedTask;

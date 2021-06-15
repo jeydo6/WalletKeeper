@@ -13,8 +13,11 @@ namespace WalletKeeper.Domain.Entities
 
 		public User(String userName) : base(userName)
 		{
+			Products = new List<Product>();
 			Receipts = new List<Receipt>();
 		}
+
+		public List<Product> Products { get; set; }
 
 		public List<Receipt> Receipts { get; set; }
 	}

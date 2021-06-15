@@ -18,6 +18,10 @@ namespace WalletKeeper.Domain.Entities
 
 		public Category Category { get; set; }
 
+		public Guid UserID { get; set; }
+
+		public User User { get; set; }
+
 		public List<ProductItem> ProductItems { get; set; }
 	}
 }
