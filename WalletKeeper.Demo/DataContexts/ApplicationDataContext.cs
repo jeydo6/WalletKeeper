@@ -119,7 +119,10 @@ namespace WalletKeeper.Demo.DataContexts
 			{
 				product.CategoryID = category1.ID;
 				product.Category = category1;
+				product.UserID = user.Id;
+				product.User = user;
 			}
+			user.Products.AddRange(category1.Products);
 			Categories.Add(category1);
 			Products.AddRange(category1.Products);
 
@@ -160,7 +163,10 @@ namespace WalletKeeper.Demo.DataContexts
 			{
 				product.CategoryID = category2.ID;
 				product.Category = category2;
+				product.UserID = user.Id;
+				product.User = user;
 			}
+			user.Products.AddRange(category2.Products);
 			Categories.Add(category2);
 			Products.AddRange(category2.Products);
 
@@ -181,7 +187,10 @@ namespace WalletKeeper.Demo.DataContexts
 			{
 				product.CategoryID = category3.ID;
 				product.Category = category3;
+				product.UserID = user.Id;
+				product.User = user;
 			}
+			user.Products.AddRange(category3.Products);
 			Categories.Add(category3);
 			Products.AddRange(category3.Products);
 
