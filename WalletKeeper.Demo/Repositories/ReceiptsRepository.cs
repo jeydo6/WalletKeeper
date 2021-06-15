@@ -41,9 +41,9 @@ namespace WalletKeeper.Demo.Repositories
 			return await Task.FromResult(receipt);
 		}
 
-		public async Task<Receipt> FindAsync(String fiscalDriveNumber, CancellationToken cancellationToken = default)
+		public async Task<Receipt> FindAsync(String fiscalDocumentNumber, String fiscalDriveNumber, CancellationToken cancellationToken = default)
 		{
-			var receipt = _dataContext.Receipts.FirstOrDefault(r => r.FiscalDriveNumber == fiscalDriveNumber);
+			var receipt = _dataContext.Receipts.FirstOrDefault(r => r.FiscalDocumentNumber == fiscalDocumentNumber && r.FiscalDriveNumber == fiscalDriveNumber);
 
 			return await Task.FromResult(receipt);
 		}

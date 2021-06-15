@@ -11,7 +11,7 @@ namespace WalletKeeper.Domain.Repositories
 
 		Task<Receipt> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default);
 
-		Task<Receipt> FindAsync(String fiscalDriveNumber, CancellationToken cancellationToken = default);
+		Task<Receipt> FindAsync(String fiscalDocumentNumber, String fiscalDriveNumber, CancellationToken cancellationToken = default);
 
 		Task<Receipt> CreateAsync(Receipt item, Guid userID, CancellationToken cancellationToken = default);
 

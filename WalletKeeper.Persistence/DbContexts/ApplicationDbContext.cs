@@ -97,7 +97,7 @@ namespace WalletKeeper.Persistence.DbContexts
 				.HasKey(e => e.ID);
 
 			modelBuilder.Entity<Receipt>()
-				.HasIndex(e => e.FiscalDriveNumber)
+				.HasIndex(e => new { e.FiscalDocumentNumber, e.FiscalDriveNumber })
 				.IsUnique(true);
 
 			modelBuilder.Entity<Receipt>()
