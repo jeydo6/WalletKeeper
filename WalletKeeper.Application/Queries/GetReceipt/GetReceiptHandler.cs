@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +55,24 @@ namespace WalletKeeper.Application.Queries
 				FiscalType = receipt.FiscalType,
 				DateTime = receipt.DateTime,
 				TotalSum = receipt.TotalSum,
-				OperationType = receipt.OperationType
+				OperationType = receipt.OperationType,
+				Place = receipt.Place,
+				Organization = new OrganizationDto
+				{
+					INN = receipt.Organization.INN,
+					Name = receipt.Organization.Name
+				},
+				ProductItems = receipt.ProductItems.Select(pi => new ProductItemDto
+				{
+					ID = pi.ID,
+					Name = pi.Name,
+					Price = pi.Price,
+					Quantity = pi.Quantity,
+					Sum = pi.Sum,
+					VAT = pi.VAT,
+					ReceiptID = pi.ReceiptID,
+					ProductID = pi.ProductID
+				}).ToArray()
 			};
 
 			return result;

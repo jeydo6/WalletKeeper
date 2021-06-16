@@ -24,6 +24,30 @@ namespace WalletKeeper.WebAPI.Controllers
 			_mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 		}
 
+		[AllowAnonymous]
+		[HttpGet("photo")]
+		[Produces(typeof(ReceiptDto))]
+		public async Task<IActionResult> Fetch(GenericDto<Byte[]> dto)
+		{
+			var barcodeString = await _mediator.Send(new DecodeReceiptQuery(dto.Value));
+
+			return Ok(
+				await _mediator.Send(new FetchReceiptQuery(barcodeString))
+			);
+		}
+
+		[AllowAnonymous]
+		[HttpGet("barcode")]
+		[Produces(typeof(ReceiptDto))]
+		public async Task<IActionResult> Fetch(GenericDto<String> dto)
+		{
+			var barcodeString = dto.Value;
+
+			return Ok(
+				await _mediator.Send(new FetchReceiptQuery(barcodeString))
+			);
+		}
+
 		[HttpGet]
 		[Produces(typeof(ReceiptDto[]))]
 		public async Task<IActionResult> List()
@@ -33,25 +57,12 @@ namespace WalletKeeper.WebAPI.Controllers
 			);
 		}
 
-		[HttpPost("photo")]
+		[HttpPost]
 		[Produces(typeof(ReceiptDto))]
-		public async Task<IActionResult> Post(GenericDto<Byte[]> dto)
+		public async Task<IActionResult> Post(ReceiptDto dto)
 		{
-			var barcodeString = await _mediator.Send(new GetQRCodeStringQuery(dto.Value));
-
 			return Ok(
-				await _mediator.Send(new CreateReceiptCommand(barcodeString))
-			);
-		}
-
-		[HttpPost("barcode")]
-		[Produces(typeof(ReceiptDto))]
-		public async Task<IActionResult> Post(GenericDto<String> dto)
-		{
-			var barcodeString = dto.Value;
-
-			return Ok(
-				await _mediator.Send(new CreateReceiptCommand(barcodeString))
+				await _mediator.Send(new CreateReceiptCommand(dto))
 			);
 		}
 

@@ -47,7 +47,24 @@ namespace WalletKeeper.Application.Queries
 					FiscalType = r.FiscalType,
 					DateTime = r.DateTime,
 					TotalSum = r.TotalSum,
-					OperationType = r.OperationType
+					OperationType = r.OperationType,
+					Place = r.Place,
+					Organization = new OrganizationDto
+					{
+						INN = r.Organization.INN,
+						Name = r.Organization.Name
+					},
+					ProductItems = r.ProductItems.Select(pi => new ProductItemDto
+					{
+						ID = pi.ID,
+						Name = pi.Name,
+						Price = pi.Price,
+						Quantity = pi.Quantity,
+						Sum = pi.Sum,
+						VAT = pi.VAT,
+						ReceiptID = pi.ReceiptID,
+						ProductID = pi.ProductID
+					}).ToArray()
 				})
 				.ToArray();
 

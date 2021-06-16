@@ -3,9 +3,9 @@ using System;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetQRCodeStringQuery : IRequest<String>
+	public class DecodeReceiptQuery : IRequest<String>
 	{
-		public GetQRCodeStringQuery(Byte[] photo)
+		public DecodeReceiptQuery(Byte[] photo)
 		{
 			Photo = photo;
 		}

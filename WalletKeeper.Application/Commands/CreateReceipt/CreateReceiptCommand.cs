@@ -1,16 +1,15 @@
 ﻿using MediatR;
-using System;
 using WalletKeeper.Application.Dto;
 
 namespace WalletKeeper.Application.Commands
 {
 	public class CreateReceiptCommand : IRequest<ReceiptDto>
 	{
-		public CreateReceiptCommand(String barcodeString)
+		public CreateReceiptCommand(ReceiptDto dto)
 		{
-			BarcodeString = barcodeString;
+			Dto = dto;
 		}
 
-		public String BarcodeString { get; }
+		public ReceiptDto Dto { get; }
 	}
 }

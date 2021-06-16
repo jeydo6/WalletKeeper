@@ -4,6 +4,11 @@ namespace WalletKeeper.Application.Dto
 {
 	public class ReceiptDto
 	{
+		public ReceiptDto()
+		{
+			ProductItems = Array.Empty<ProductItemDto>();
+		}
+
 		public Int32 ID { get; set; }
 
 		public String FiscalDocumentNumber { get; set; }
@@ -17,5 +22,11 @@ namespace WalletKeeper.Application.Dto
 		public Decimal TotalSum { get; set; }
 
 		public Int32 OperationType { get; set; }
+
+		public String Place { get; set; }
+
+		public OrganizationDto Organization { get; set; }
+
+		public ProductItemDto[] ProductItems { get; set; }
 	}
 }

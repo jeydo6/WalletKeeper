@@ -7,22 +7,22 @@ using WalletKeeper.Barcodes.Decoders;
 
 namespace WalletKeeper.Application.Queries
 {
-	public class GetQRCodeStringHandler : IRequestHandler<GetQRCodeStringQuery, String>
+	public class DecodeReceiptHandler : IRequestHandler<DecodeReceiptQuery, String>
 	{
 		private readonly MagickQRCodeDecoder _barcodeDecoder;
 
-		private readonly ILogger<GetQRCodeStringHandler> _logger;
+		private readonly ILogger<DecodeReceiptHandler> _logger;
 
-		public GetQRCodeStringHandler(
+		public DecodeReceiptHandler(
 			MagickQRCodeDecoder barcodeDecoder,
-			ILogger<GetQRCodeStringHandler> logger
+			ILogger<DecodeReceiptHandler> logger
 		)
 		{
 			_barcodeDecoder = barcodeDecoder ?? throw new ArgumentNullException(nameof(barcodeDecoder));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<String> Handle(GetQRCodeStringQuery request, CancellationToken cancellationToken)
+		public async Task<String> Handle(DecodeReceiptQuery request, CancellationToken cancellationToken)
 		{
 			var result = _barcodeDecoder.Decode(request.Photo);
 
