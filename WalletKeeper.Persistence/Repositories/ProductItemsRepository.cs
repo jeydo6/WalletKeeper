@@ -29,7 +29,7 @@ namespace WalletKeeper.Persistence.Repositories
 		public async Task<ProductItem[]> GetAsync(Guid userID, CancellationToken cancellationToken = default)
 		{
 			var productItems = await _dbContext.ProductItems
-				.Where(pi => pi.Receipt.UserID == userID)
+				.Where(pi => pi.UserID == userID)
 				.ToArrayAsync(cancellationToken);
 
 			return productItems;
@@ -37,14 +37,14 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task<ProductItem> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == id && pi.Receipt.UserID == userID, cancellationToken);
+			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == id && pi.UserID == userID, cancellationToken);
 
 			return productItem;
 		}
 
-		public async Task<ProductItem> UpdateAsync(ProductItem item, Guid userID, CancellationToken cancellationToken = default)
+		public async Task<ProductItem> UpdateAsync(ProductItem item, CancellationToken cancellationToken = default)
 		{
-			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == item.ID && pi.Receipt.UserID == userID, cancellationToken);
+			var productItem = await _dbContext.ProductItems.FirstOrDefaultAsync(pi => pi.ID == item.ID && pi.UserID == item.UserID, cancellationToken);
 			if (productItem == null)
 			{
 				throw new BusinessException("ProductItem is not exists!");

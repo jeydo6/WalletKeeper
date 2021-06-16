@@ -14,6 +14,11 @@ namespace WalletKeeper.Domain.Entities
 
 		public Decimal Sum { get; set; }
 
+		/// <summary>
+		/// Value-added tax
+		/// </summary>
+		public Decimal VAT { get; set; }
+
 		public Int32? ReceiptID { get; set; }
 
 		public Receipt Receipt { get; set; }
@@ -21,5 +26,9 @@ namespace WalletKeeper.Domain.Entities
 		public Int32? ProductID { get; set; }
 
 		public Product Product { get; set; }
+
+		public Guid? UserID { get; set; }
+
+		public User User { get; set; }
 	}
 }

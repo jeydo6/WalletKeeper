@@ -92,6 +92,10 @@ namespace WalletKeeper.Persistence.DbContexts
 				.Property(e => e.Sum)
 				.HasPrecision(18, 2);
 
+			modelBuilder.Entity<ProductItem>()
+				.Property(e => e.VAT)
+				.HasPrecision(18, 2);
+
 			modelBuilder.Entity<Receipt>()
 				.ToTable("Receipts")
 				.HasKey(e => e.ID);

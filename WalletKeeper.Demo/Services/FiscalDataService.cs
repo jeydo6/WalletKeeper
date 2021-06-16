@@ -85,7 +85,8 @@ namespace WalletKeeper.Demo.Services
 					Name = productItem.Name,
 					Price = price,
 					Quantity = productItem.Quantity,
-					Sum = sum
+					Sum = sum,
+					VAT = 0.10m
 				});
 
 				resultSum += sum;
@@ -98,7 +99,8 @@ namespace WalletKeeper.Demo.Services
 					Name = "На кофе разработчику",
 					Price = receipt.TotalSum - resultSum,
 					Quantity = 1.0000m,
-					Sum = receipt.TotalSum - resultSum
+					Sum = receipt.TotalSum - resultSum,
+					VAT = 0.00m
 				});
 			}
 
@@ -110,7 +112,8 @@ namespace WalletKeeper.Demo.Services
 					Price = g.Key.Price,
 					Quantity = g.Sum(pi => pi.Quantity),
 					Sum = g.Sum(pi => pi.Sum),
-					Receipt = receipt
+					Receipt = receipt,
+					VAT = 0.10m
 				})
 				.ToList();
 		}

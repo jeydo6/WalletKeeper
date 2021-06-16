@@ -46,6 +46,7 @@ namespace WalletKeeper.Application.Queries
 					Price = pi.Price,
 					Quantity = pi.Quantity,
 					Sum = pi.Sum,
+					VAT = pi.VAT,
 					ProductID = pi.ProductID,
 					ReceiptID = pi.ReceiptID
 				})

@@ -36,14 +36,14 @@ namespace WalletKeeper.Demo.Repositories
 
 		public async Task<ProductItem> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			var productItem = _dataContext.ProductItems.FirstOrDefault(pi => pi.ID == id && pi.Receipt.UserID == userID);
+			var productItem = _dataContext.ProductItems.FirstOrDefault(pi => pi.ID == id && pi.UserID == userID);
 
 			return await Task.FromResult(productItem);
 		}
 
-		public async Task<ProductItem> UpdateAsync(ProductItem item, Guid userID, CancellationToken cancellationToken = default)
+		public async Task<ProductItem> UpdateAsync(ProductItem item, CancellationToken cancellationToken = default)
 		{
-			var productItem = _dataContext.ProductItems.FirstOrDefault(pi => pi.ID == item.ID && pi.Receipt.UserID == userID);
+			var productItem = _dataContext.ProductItems.FirstOrDefault(pi => pi.ID == item.ID && pi.UserID == item.UserID);
 			if (productItem == null)
 			{
 				throw new BusinessException("ProductItem is not exists!");

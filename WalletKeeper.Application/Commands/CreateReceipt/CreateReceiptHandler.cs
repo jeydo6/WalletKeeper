@@ -56,6 +56,11 @@ namespace WalletKeeper.Application.Commands
 			var item = await _fiscalDataService.GetReceipt(qrcode);
 			item.UserID = userID;
 			item.User = null;
+			foreach (var productItem in item.ProductItems)
+			{
+				productItem.UserID = userID;
+				productItem.User = null;
+			}
 
 			receipt = await _repository.CreateAsync(item, cancellationToken);
 

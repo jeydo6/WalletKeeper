@@ -214,70 +214,80 @@ namespace WalletKeeper.Demo.DataContexts
 						ID = 1,
 						Name = "Картофель",
 						Price = 60.00m,
-						Quantity = 1.00m
+						Quantity = 1.00m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 2,
 						Name = "Томаты",
 						Price = 300.00m,
-						Quantity = 0.50m
+						Quantity = 0.50m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 3,
 						Name = "Огурцы",
 						Price = 160.00m,
-						Quantity = 1.00m
+						Quantity = 1.00m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 4,
 						Name = "Болгарский перец",
 						Price = 360.00m,
-						Quantity = 0.30m
+						Quantity = 0.30m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 5,
 						Name = "Кабачки",
 						Price = 90.00m,
-						Quantity = 1.00m
+						Quantity = 1.00m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 6,
 						Name = "Яблоки",
 						Price = 180.00m,
-						Quantity = 2.00m
+						Quantity = 2.00m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 7,
 						Name = "Груши",
 						Price = 210.00m,
-						Quantity = 1.50m
+						Quantity = 1.50m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 8,
 						Name = "Апельсины",
 						Price = 140.00m,
-						Quantity = 0.50m
+						Quantity = 0.50m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 9,
 						Name = "Киви",
 						Price = 300.00m,
-						Quantity = 0.30m
+						Quantity = 0.30m,
+						VAT = 0.10m
 					},
 					new ProductItem
 					{
 						ID = 10,
 						Name = "Манго",
 						Price = 660.00m,
-						Quantity = 0.50m
+						Quantity = 0.50m,
+						VAT = 0.10m
 					}
 				}
 			};
@@ -299,10 +309,13 @@ namespace WalletKeeper.Demo.DataContexts
 				{
 					productItem.ProductID = product.ID;
 					productItem.Product = product;
+					productItem.UserID = user.Id;
+					productItem.User = user;
 
 					product.ProductItems.Add(productItem);
 				}
 			}
+			user.ProductItems.AddRange(receipt.ProductItems);
 			Receipts.Add(receipt);
 			ProductItems.AddRange(receipt.ProductItems);
 		}
