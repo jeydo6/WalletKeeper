@@ -2,12 +2,10 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Domain.Extensions;
 using WalletKeeper.Domain.Repositories;
 using WalletKeeper.Persistence.DbContexts;
 
@@ -17,27 +15,19 @@ namespace WalletKeeper.Persistence.Repositories
 	{
 		private readonly ApplicationDbContext _dbContext;
 
-		private readonly IPrincipal _principal;
 		private readonly ILogger<ReceiptsRepository> _logger;
 
 		public ReceiptsRepository(
 			ApplicationDbContext dbContext,
-			IPrincipal principal,
 			ILogger<ReceiptsRepository> logger
 		)
 		{
 			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<Receipt[]> GetAsync(CancellationToken cancellationToken = default)
+		public async Task<Receipt[]> GetAsync(Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var receipts = await _dbContext.Receipts
 				.Where(pi => pi.UserID == userID)
 				.ToArrayAsync(cancellationToken);
@@ -45,25 +35,15 @@ namespace WalletKeeper.Persistence.Repositories
 			return receipts;
 		}
 
-		public async Task<Receipt> GetAsync(Int32 id, CancellationToken cancellationToken = default)
+		public async Task<Receipt> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r => r.ID == id && r.UserID == userID, cancellationToken);
 
 			return receipt;
 		}
 
-		public async Task<Receipt> FindAsync(String fiscalDocumentNumber, String fiscalDriveNumber, CancellationToken cancellationToken = default)
+		public async Task<Receipt> FindAsync(String fiscalDocumentNumber, String fiscalDriveNumber, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var receipt = await _dbContext.Receipts.FirstOrDefaultAsync(r =>
 				r.FiscalDocumentNumber == fiscalDocumentNumber
 				&& r.FiscalDriveNumber == fiscalDriveNumber
@@ -76,14 +56,6 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task<Receipt> CreateAsync(Receipt item, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
-			item.UserID = userID;
-			item.User = null;
-
 			var products = await _dbContext.Products
 				.Include(p => p.ProductItems)
 				.OrderByDescending(p => p.ProductItems.Count)
@@ -123,13 +95,8 @@ namespace WalletKeeper.Persistence.Repositories
 			return item;
 		}
 
-		public async Task DeleteAsync(Int32 id, CancellationToken cancellationToken = default)
+		public async Task DeleteAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var receipt = await _dbContext.Receipts
 				.Include(r => r.ProductItems)
 				.FirstOrDefaultAsync(r => r.ID == id && r.UserID == userID, cancellationToken);
