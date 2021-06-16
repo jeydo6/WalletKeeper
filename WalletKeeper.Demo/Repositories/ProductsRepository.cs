@@ -30,13 +30,8 @@ namespace WalletKeeper.Demo.Repositories
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<Product[]> GetAsync(CancellationToken cancellationToken = default)
+		public async Task<Product[]> GetAsync(Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var products = _dataContext.Products
 				.Where(p => p.UserID == userID)
 				.ToArray();
@@ -44,13 +39,8 @@ namespace WalletKeeper.Demo.Repositories
 			return await Task.FromResult(products);
 		}
 
-		public async Task<Product> GetAsync(Int32 id, CancellationToken cancellationToken = default)
+		public async Task<Product> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var product = _dataContext.Products.FirstOrDefault(p => p.ID == id && p.UserID == userID);
 
 			return await Task.FromResult(product);
@@ -111,13 +101,8 @@ namespace WalletKeeper.Demo.Repositories
 			return await Task.FromResult(product);
 		}
 
-		public async Task DeleteAsync(Int32 id, CancellationToken cancellationToken = default)
+		public async Task DeleteAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var product = _dataContext.Products.FirstOrDefault(p => p.ID == id && p.UserID == userID);
 			if (product == null)
 			{

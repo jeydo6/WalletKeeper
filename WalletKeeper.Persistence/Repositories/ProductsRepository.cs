@@ -2,12 +2,10 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Exceptions;
-using WalletKeeper.Domain.Extensions;
 using WalletKeeper.Domain.Repositories;
 using WalletKeeper.Persistence.DbContexts;
 
@@ -17,27 +15,19 @@ namespace WalletKeeper.Persistence.Repositories
 	{
 		private readonly ApplicationDbContext _dbContext;
 
-		private readonly IPrincipal _principal;
 		private readonly ILogger<ProductsRepository> _logger;
 
 		public ProductsRepository(
 			ApplicationDbContext dbContext,
-			IPrincipal principal,
 			ILogger<ProductsRepository> logger
 		)
 		{
 			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<Product[]> GetAsync(CancellationToken cancellationToken = default)
+		public async Task<Product[]> GetAsync(Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var products = await _dbContext.Products
 				.Where(p => p.UserID == userID)
 				.ToArrayAsync(cancellationToken);
@@ -45,13 +35,8 @@ namespace WalletKeeper.Persistence.Repositories
 			return products;
 		}
 
-		public async Task<Product> GetAsync(Int32 id, CancellationToken cancellationToken = default)
+		public async Task<Product> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == id && p.UserID == userID, cancellationToken);
 
 			return product;
@@ -59,14 +44,7 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task<Product> CreateAsync(Product item, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
-			item.UserID = userID;
-
-			var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.Name == item.Name && p.UserID == userID, cancellationToken);
+			var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.Name == item.Name && p.UserID == item.UserID, cancellationToken);
 			if (product != null)
 			{
 				throw new BusinessException("Product already exists!");
@@ -80,12 +58,7 @@ namespace WalletKeeper.Persistence.Repositories
 
 		public async Task<Product> UpdateAsync(Product item, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
-			var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == item.ID && p.UserID == userID, cancellationToken);
+			var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == item.ID && p.UserID == item.UserID, cancellationToken);
 			if (product == null)
 			{
 				throw new BusinessException("Product is not exists!");
@@ -100,13 +73,8 @@ namespace WalletKeeper.Persistence.Repositories
 			return product;
 		}
 
-		public async Task DeleteAsync(Int32 id, CancellationToken cancellationToken = default)
+		public async Task DeleteAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
-			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
-			{
-				throw new BusinessException($"{nameof(userID)} is invalid");
-			}
-
 			var product = await _dbContext.Products
 				.Include(p => p.ProductItems)
 				.FirstOrDefaultAsync(p => p.ID == id && p.UserID == userID, cancellationToken);
