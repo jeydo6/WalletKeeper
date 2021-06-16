@@ -53,11 +53,13 @@ namespace WalletKeeper.Application.Commands
 				Price = request.Dto.Price,
 				Quantity = request.Dto.Quantity,
 				Sum = request.Dto.Sum,
+				VAT = request.Dto.VAT,
 				ProductID = request.Dto.ProductID,
-				ReceiptID = request.Dto.ReceiptID
+				ReceiptID = request.Dto.ReceiptID,
+				UserID = userID
 			};
 
-			var productItem = await _repository.UpdateAsync(item, userID, cancellationToken);
+			var productItem = await _repository.UpdateAsync(item, cancellationToken);
 
 			var result = new ProductItemDto
 			{
@@ -66,6 +68,7 @@ namespace WalletKeeper.Application.Commands
 				Price = productItem.Price,
 				Quantity = productItem.Quantity,
 				Sum = productItem.Sum,
+				VAT = productItem.VAT,
 				ProductID = productItem.ProductID,
 				ReceiptID = productItem.ReceiptID
 			};

@@ -84,11 +84,12 @@ namespace WalletKeeper.Infrastructure.Services
 				};
 
 				receipt.ProductItems = jObject["items"]
-					.GroupBy(jt => new { Name = jt.Value<String>("name"), Price = jt.Value<Decimal>("price") / 100 })
+					.GroupBy(jt => new { Name = jt.Value<String>("name"), Price = jt.Value<Decimal>("price") / 100, VAT = jt.Value<Decimal>("nds") / 10 })
 					.Select(g => new ProductItem
 					{
 						Name = g.Key.Name,
 						Price = g.Key.Price,
+						VAT = g.Key.VAT,
 						Quantity = g.Sum(jt => jt.Value<Decimal>("quantity")),
 						Sum = g.Sum(jt => jt.Value<Decimal>("sum")) / 100,
 						Receipt = receipt

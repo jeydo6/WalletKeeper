@@ -11,6 +11,6 @@ namespace WalletKeeper.Domain.Repositories
 
 		Task<ProductItem> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default);
 
-		Task<ProductItem> UpdateAsync(ProductItem item, Guid userID, CancellationToken cancellationToken = default);
+		Task<ProductItem> UpdateAsync(ProductItem item, CancellationToken cancellationToken = default);
 	}
 }
