@@ -38,6 +38,7 @@ namespace WalletKeeper.Application.Commands
 
 			var item = new Category
 			{
+				ID = request.Dto.ID,
 				Name = request.Dto.Name
 			};
 
