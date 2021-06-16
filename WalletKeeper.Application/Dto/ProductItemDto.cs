@@ -14,7 +14,7 @@ namespace WalletKeeper.Application.Dto
 
 		public Decimal Sum { get; set; }
 
-		public Decimal VAT { get; set; }
+		public Decimal NDS { get; set; }
 
 		public Int32? ReceiptID { get; set; }
 

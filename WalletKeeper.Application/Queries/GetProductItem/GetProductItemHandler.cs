@@ -53,7 +53,7 @@ namespace WalletKeeper.Application.Queries
 				Price = productItem.Price,
 				Quantity = productItem.Quantity,
 				Sum = productItem.Sum,
-				VAT = productItem.VAT,
+				NDS = productItem.NDS,
 				ProductID = productItem.ProductID,
 				ReceiptID = productItem.ReceiptID
 			};

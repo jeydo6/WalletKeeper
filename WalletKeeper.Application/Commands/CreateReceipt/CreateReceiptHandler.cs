@@ -69,7 +69,7 @@ namespace WalletKeeper.Application.Commands
 					Price = pi.Price,
 					Quantity = pi.Quantity,
 					Sum = pi.Sum,
-					VAT = pi.VAT,
+					NDS = pi.NDS,
 					UserID = userID
 				}).ToList(),
 				UserID = userID
@@ -99,7 +99,7 @@ namespace WalletKeeper.Application.Commands
 					Price = pi.Price,
 					Quantity = pi.Quantity,
 					Sum = pi.Sum,
-					VAT = pi.VAT,
+					NDS = pi.NDS,
 					ReceiptID = pi.ReceiptID,
 					ProductID = pi.ProductID
 				}).ToArray()

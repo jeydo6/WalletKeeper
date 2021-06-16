@@ -215,7 +215,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Картофель",
 						Price = 60.00m,
 						Quantity = 1.00m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -223,7 +223,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Томаты",
 						Price = 300.00m,
 						Quantity = 0.50m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -231,7 +231,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Огурцы",
 						Price = 160.00m,
 						Quantity = 1.00m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -239,7 +239,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Болгарский перец",
 						Price = 360.00m,
 						Quantity = 0.30m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -247,7 +247,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Кабачки",
 						Price = 90.00m,
 						Quantity = 1.00m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -255,7 +255,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Яблоки",
 						Price = 180.00m,
 						Quantity = 2.00m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -263,7 +263,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Груши",
 						Price = 210.00m,
 						Quantity = 1.50m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -271,7 +271,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Апельсины",
 						Price = 140.00m,
 						Quantity = 0.50m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -279,7 +279,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Киви",
 						Price = 300.00m,
 						Quantity = 0.30m,
-						VAT = 0.10m
+						NDS = 0.10m
 					},
 					new ProductItem
 					{
@@ -287,7 +287,7 @@ namespace WalletKeeper.Demo.DataContexts
 						Name = "Манго",
 						Price = 660.00m,
 						Quantity = 0.50m,
-						VAT = 0.10m
+						NDS = 0.10m
 					}
 				}
 			};

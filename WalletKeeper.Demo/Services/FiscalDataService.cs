@@ -86,7 +86,7 @@ namespace WalletKeeper.Demo.Services
 					Price = price,
 					Quantity = productItem.Quantity,
 					Sum = sum,
-					VAT = 0.10m
+					NDS = 0.10m
 				});
 
 				resultSum += sum;
@@ -100,7 +100,7 @@ namespace WalletKeeper.Demo.Services
 					Price = receipt.TotalSum - resultSum,
 					Quantity = 1.0000m,
 					Sum = receipt.TotalSum - resultSum,
-					VAT = 0.00m
+					NDS = 0.00m
 				});
 			}
 
@@ -113,7 +113,7 @@ namespace WalletKeeper.Demo.Services
 					Quantity = g.Sum(pi => pi.Quantity),
 					Sum = g.Sum(pi => pi.Sum),
 					Receipt = receipt,
-					VAT = 0.10m
+					NDS = 0.10m
 				})
 				.ToList();
 		}

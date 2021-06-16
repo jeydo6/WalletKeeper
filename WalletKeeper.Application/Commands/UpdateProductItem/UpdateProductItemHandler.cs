@@ -53,7 +53,7 @@ namespace WalletKeeper.Application.Commands
 				Price = request.Dto.Price,
 				Quantity = request.Dto.Quantity,
 				Sum = request.Dto.Sum,
-				VAT = request.Dto.VAT,
+				NDS = request.Dto.NDS,
 				ProductID = request.Dto.ProductID,
 				ReceiptID = request.Dto.ReceiptID,
 				UserID = userID
@@ -68,7 +68,7 @@ namespace WalletKeeper.Application.Commands
 				Price = productItem.Price,
 				Quantity = productItem.Quantity,
 				Sum = productItem.Sum,
-				VAT = productItem.VAT,
+				NDS = productItem.NDS,
 				ProductID = productItem.ProductID,
 				ReceiptID = productItem.ReceiptID
 			};

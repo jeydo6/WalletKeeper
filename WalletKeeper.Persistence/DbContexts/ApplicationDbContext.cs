@@ -93,7 +93,7 @@ namespace WalletKeeper.Persistence.DbContexts
 				.HasPrecision(18, 2);
 
 			modelBuilder.Entity<ProductItem>()
-				.Property(e => e.VAT)
+				.Property(e => e.NDS)
 				.HasPrecision(18, 2);
 
 			modelBuilder.Entity<Receipt>()

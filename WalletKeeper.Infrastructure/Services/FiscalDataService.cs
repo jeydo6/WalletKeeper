@@ -89,7 +89,7 @@ namespace WalletKeeper.Infrastructure.Services
 					{
 						Name = g.Key.Name,
 						Price = g.Key.Price,
-						VAT = g.Key.VAT,
+						NDS = g.Key.VAT,
 						Quantity = g.Sum(jt => jt.Value<Decimal>("quantity")),
 						Sum = g.Sum(jt => jt.Value<Decimal>("sum")) / 100,
 						Receipt = receipt
