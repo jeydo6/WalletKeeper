@@ -7,10 +7,10 @@ namespace WalletKeeper.Domain.Repositories
 {
 	public interface IProductItemsRepository
 	{
-		Task<ProductItem[]> GetAsync(CancellationToken cancellationToken = default);
+		Task<ProductItem[]> GetAsync(Guid userID, CancellationToken cancellationToken = default);
 
-		Task<ProductItem> GetAsync(Int32 id, CancellationToken cancellationToken = default);
+		Task<ProductItem> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default);
 
-		Task<ProductItem> UpdateAsync(ProductItem item, CancellationToken cancellationToken = default);
+		Task<ProductItem> UpdateAsync(ProductItem item, Guid userID, CancellationToken cancellationToken = default);
 	}
 }
