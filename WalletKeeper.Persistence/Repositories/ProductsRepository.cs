@@ -26,8 +26,8 @@ namespace WalletKeeper.Persistence.Repositories
 			ILogger<ProductsRepository> logger
 		)
 		{
-			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+			_principal = principal ?? throw new ArgumentNullException(nameof(principal));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -78,14 +78,14 @@ namespace WalletKeeper.Persistence.Repositories
 			return item;
 		}
 
-		public async Task<Product> UpdateAsync(Int32 id, Product item, CancellationToken cancellationToken = default)
+		public async Task<Product> UpdateAsync(Product item, CancellationToken cancellationToken = default)
 		{
 			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
 			{
 				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
-			var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == id && p.UserID == userID, cancellationToken);
+			var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == item.ID && p.UserID == userID, cancellationToken);
 			if (product == null)
 			{
 				throw new BusinessException("Product is not exists!");

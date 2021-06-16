@@ -26,14 +26,14 @@ namespace WalletKeeper.Application.Commands
 
 		public async Task<CategoryDto> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
 		{
-			if (request.ID <= 0)
-			{
-				throw new ValidationException($"{nameof(request.ID)} is invalid");
-			}
-
 			if (request.Dto == null)
 			{
 				throw new ValidationException($"{nameof(request.Dto)} is invalid");
+			}
+
+			if (request.Dto.ID <= 0)
+			{
+				throw new ValidationException($"{nameof(request.Dto.ID)} is invalid");
 			}
 
 			var item = new Category
@@ -41,7 +41,7 @@ namespace WalletKeeper.Application.Commands
 				Name = request.Dto.Name
 			};
 
-			var category = await _repository.UpdateAsync(request.ID, item, cancellationToken);
+			var category = await _repository.UpdateAsync(item, cancellationToken);
 
 			var result = new CategoryDto
 			{
