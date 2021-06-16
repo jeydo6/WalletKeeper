@@ -17,6 +17,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using WalletKeeper.Barcodes.Decoders;
+using WalletKeeper.Barcodes.Encoders;
 using WalletKeeper.Domain.Configs;
 using WalletKeeper.Domain.Entities;
 using WalletKeeper.Domain.Factories;
@@ -108,6 +109,7 @@ namespace WalletKeeper.WebAPI
 
 			services
 				.AddSingleton<MagickQRCodeDecoder>()
+				.AddSingleton<MagickQRCodeEncoder>()
 				.AddSingleton<EmailMessageFactory>();
 
 			#region ConfigureServices

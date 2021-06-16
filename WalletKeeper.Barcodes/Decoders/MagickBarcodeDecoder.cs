@@ -3,12 +3,13 @@ using System;
 using WalletKeeper.Barcodes.Enumerations;
 using WalletKeeper.Barcodes.Readers;
 using ZXing;
+using ZXing.Common;
 
 namespace WalletKeeper.Barcodes.Decoders
 {
 	public abstract class MagickBarcodeDecoder : IBarcodeDecoder
 	{
-		private readonly MagickBarcodeReader _reader;
+		private readonly IBarcodeReader<IMagickImage> _reader;
 		private readonly Func<IMagickImage, Result>[] _methods;
 
 		public MagickBarcodeDecoder(BarcodeFormatEnum barcodeFormat)
@@ -21,26 +22,31 @@ namespace WalletKeeper.Barcodes.Decoders
 				AutoThresholdTriangle,
 				Quantize
 			};
-			_reader = new MagickBarcodeReader();
-			_reader.Options.PossibleFormats = new BarcodeFormat[]
+			_reader = new MagickBarcodeReader
 			{
-				(BarcodeFormat)barcodeFormat
+				Options = new DecodingOptions
+				{
+					PossibleFormats = new BarcodeFormat[]
+					{
+						(BarcodeFormat)barcodeFormat
+					},
+					TryHarder = true
+				}
 			};
-			_reader.Options.TryHarder = true;
 		}
 
-		public String Decode(IMagickImage image)
+		public String Decode(IMagickImage barcodeImage)
 		{
 			return Decode(
-				image.ToByteArray()
+				barcodeImage.ToByteArray()
 			);
 		}
 
-		public String Decode(Byte[] image)
+		public String Decode(Byte[] barcodeImage)
 		{
 			foreach (var method in _methods)
 			{
-				var copy = new MagickImage(image);
+				var copy = new MagickImage(barcodeImage);
 				var result = method(copy);
 				if (result != null)
 				{

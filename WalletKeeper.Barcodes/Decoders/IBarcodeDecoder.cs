@@ -4,6 +4,6 @@ namespace WalletKeeper.Barcodes.Decoders
 {
 	public interface IBarcodeDecoder
 	{
-		String Decode(Byte[] image);
+		String Decode(Byte[] barcodeImage);
 	}
 }

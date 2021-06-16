@@ -5,7 +5,7 @@ using ZXing;
 
 namespace WalletKeeper.Barcodes.Readers
 {
-	public class MagickBarcodeReader : BarcodeReader<IMagickImage>
+	internal class MagickBarcodeReader : BarcodeReader<IMagickImage>
 	{
 		/// <summary>
 		/// define a custom function for creation of a luminance source with our specialized MagickImage-supporting class

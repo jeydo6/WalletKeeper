@@ -25,26 +25,22 @@ namespace WalletKeeper.WebAPI.Controllers
 		}
 
 		[AllowAnonymous]
-		[HttpGet("photo")]
+		[HttpGet("fetch")]
 		[Produces(typeof(ReceiptDto))]
-		public async Task<IActionResult> Fetch(GenericDto<Byte[]> dto)
+		public async Task<IActionResult> Fetch(GenericDto<String> dto)
 		{
-			var barcodeString = await _mediator.Send(new DecodeReceiptQuery(dto.Value));
-
 			return Ok(
-				await _mediator.Send(new FetchReceiptQuery(barcodeString))
+				await _mediator.Send(new FetchReceiptQuery(dto.Value))
 			);
 		}
 
 		[AllowAnonymous]
-		[HttpGet("barcode")]
+		[HttpPost("stringify")]
 		[Produces(typeof(ReceiptDto))]
-		public async Task<IActionResult> Fetch(GenericDto<String> dto)
+		public async Task<IActionResult> Stringify(ReceiptDto dto)
 		{
-			var barcodeString = dto.Value;
-
 			return Ok(
-				await _mediator.Send(new FetchReceiptQuery(barcodeString))
+				await _mediator.Send(new StringifyReceiptQuery(dto))
 			);
 		}
 

@@ -30,6 +30,7 @@ namespace WalletKeeper.Persistence.Repositories
 		{
 			var receipts = await _dbContext.Receipts
 				.Where(r => r.UserID == userID)
+				.Include(r => r.Organization)
 				.Include(r => r.ProductItems)
 				.ToArrayAsync(cancellationToken);
 
@@ -39,6 +40,7 @@ namespace WalletKeeper.Persistence.Repositories
 		public async Task<Receipt> GetAsync(Int32 id, Guid userID, CancellationToken cancellationToken = default)
 		{
 			var receipt = await _dbContext.Receipts
+				.Include(r => r.Organization)
 				.Include(r => r.ProductItems)
 				.FirstOrDefaultAsync(r => r.ID == id && r.UserID == userID, cancellationToken);
 

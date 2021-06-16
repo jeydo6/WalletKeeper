@@ -4,22 +4,17 @@ namespace WalletKeeper.Domain.Types
 {
 	public class QRCode
 	{
-		private QRCode()
-		{
-			//
-		}
+		public String FiscalDocumentNumber { get; set; }
 
-		public String FiscalDocumentNumber { get; private set; }
+		public String FiscalDriveNumber { get; set; }
 
-		public String FiscalDriveNumber { get; private set; }
+		public String FiscalType { get; set; }
 
-		public String FiscalType { get; private set; }
+		public String DateTime { get; set; }
 
-		public String DateTime { get; private set; }
+		public String TotalSum { get; set; }
 
-		public String TotalSum { get; private set; }
-
-		public String OperationType { get; private set; }
+		public String OperationType { get; set; }
 
 		public static QRCode Parse(String qrcodeString)
 		{
@@ -64,6 +59,11 @@ namespace WalletKeeper.Domain.Types
 			}
 
 			return qrcode;
+		}
+
+		public override String ToString()
+		{
+			return $"t={DateTime}&s={TotalSum}&fn={FiscalDriveNumber}&i={FiscalDocumentNumber}&fp={FiscalType}&n={OperationType}";
 		}
 	}
 }
