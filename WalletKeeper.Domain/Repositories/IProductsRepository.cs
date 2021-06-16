@@ -13,7 +13,7 @@ namespace WalletKeeper.Domain.Repositories
 
 		Task<Product> CreateAsync(Product item, CancellationToken cancellationToken = default);
 
-		Task<Product> UpdateAsync(Int32 id, Product item, CancellationToken cancellationToken = default);
+		Task<Product> UpdateAsync(Product item, CancellationToken cancellationToken = default);
 
 		Task DeleteAsync(Int32 id, CancellationToken cancellationToken = default);
 	}

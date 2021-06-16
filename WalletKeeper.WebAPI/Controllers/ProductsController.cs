@@ -42,21 +42,21 @@ namespace WalletKeeper.WebAPI.Controllers
 			);
 		}
 
+		[HttpPut]
+		[Produces(typeof(ProductDto))]
+		public async Task<IActionResult> Put(ProductDto dto)
+		{
+			return Ok(
+				await _mediator.Send(new UpdateProductCommand(dto))
+			);
+		}
+
 		[HttpGet("{id}")]
 		[Produces(typeof(ProductDto))]
 		public async Task<IActionResult> Get(Int32 id)
 		{
 			return Ok(
 				await _mediator.Send(new GetProductQuery(id))
-			);
-		}
-
-		[HttpPut("{id}")]
-		[Produces(typeof(ProductDto))]
-		public async Task<IActionResult> Put(Int32 id, ProductDto dto)
-		{
-			return Ok(
-				await _mediator.Send(new UpdateProductCommand(id, dto))
 			);
 		}
 

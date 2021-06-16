@@ -53,9 +53,9 @@ namespace WalletKeeper.Demo.Repositories
 			return await Task.FromResult(item);
 		}
 
-		public async Task<Category> UpdateAsync(Int32 id, Category item, CancellationToken cancellationToken = default)
+		public async Task<Category> UpdateAsync(Category item, CancellationToken cancellationToken = default)
 		{
-			var category = _dataContext.Categories.FirstOrDefault(c => c.ID == id);
+			var category = _dataContext.Categories.FirstOrDefault(c => c.ID == item.ID);
 			if (category == null)
 			{
 				throw new BusinessException("Category is not exists!");

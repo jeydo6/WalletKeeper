@@ -86,14 +86,14 @@ namespace WalletKeeper.Demo.Repositories
 			return await Task.FromResult(item);
 		}
 
-		public async Task<Product> UpdateAsync(Int32 id, Product item, CancellationToken cancellationToken = default)
+		public async Task<Product> UpdateAsync(Product item, CancellationToken cancellationToken = default)
 		{
 			if (!Guid.TryParse(_principal.GetUserID(), out var userID))
 			{
 				throw new BusinessException($"{nameof(userID)} is invalid");
 			}
 
-			var product = _dataContext.Products.FirstOrDefault(p => p.Name == item.Name && p.UserID == userID);
+			var product = _dataContext.Products.FirstOrDefault(p => p.ID == item.ID && p.UserID == userID);
 			if (product == null)
 			{
 				throw new BusinessException("Product is not exists!");
