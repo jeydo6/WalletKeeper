@@ -44,12 +44,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		}
 
 		[HttpDelete]
-		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
+		[ProducesResponseType((Int32)HttpStatusCode.OK)]
 		public async Task<IActionResult> Delete()
 		{
-			await _mediator.Send(new DeleteUserCommand());
-
-			return NoContent();
+			return Ok(
+				await _mediator.Send(new DeleteUserCommand())
+			);
 		}
 
 		[HttpPatch("change/userName")]
@@ -71,12 +71,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		}
 
 		[HttpGet("change/email")]
-		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
+		[ProducesResponseType((Int32)HttpStatusCode.OK)]
 		public async Task<IActionResult> ChangeEmail(String email)
 		{
-			await _mediator.Send(new ChangeUserEmailQuery(email));
-
-			return NoContent();
+			return Ok(
+				await _mediator.Send(new ChangeUserEmailQuery(email))
+			);
 		}
 
 		[HttpPatch("change/email")]
@@ -89,12 +89,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		}
 
 		[HttpGet("confirm/email")]
-		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
+		[ProducesResponseType((Int32)HttpStatusCode.OK)]
 		public async Task<IActionResult> ConfirmEmail()
 		{
-			await _mediator.Send(new ConfirmUserEmailQuery());
-
-			return NoContent();
+			return Ok(
+				await _mediator.Send(new ConfirmUserEmailQuery())
+			);
 		}
 
 		[HttpPatch("confirm/email")]
@@ -107,12 +107,12 @@ namespace WalletKeeper.WebAPI.Controllers
 		}
 
 		[HttpGet("reset/password")]
-		[ProducesResponseType((Int32)HttpStatusCode.NoContent)]
+		[ProducesResponseType((Int32)HttpStatusCode.OK)]
 		public async Task<IActionResult> ResetPassword()
 		{
-			await _mediator.Send(new ResetUserPasswordQuery());
-
-			return NoContent();
+			return Ok(
+				await _mediator.Send(new ResetUserPasswordQuery())
+			);
 		}
 
 		[HttpPatch("reset/password")]
